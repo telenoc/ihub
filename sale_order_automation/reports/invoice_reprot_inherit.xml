@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="account_move_inherit" inherit_id="l10n_gcc_invoice.arabic_english_invoice">
+        <xpath expr="//table[hasclass('o_main_table')]/thead/tr/th[@name='th_quantity']" position="after">
+            <th name="th_uom_note" class="text-end">
+                <span>
+                    UoM Note
+                </span>
+                <br/>
+                <span>
+                    أوم لاحظ
+                </span>
+            </th>
+        </xpath>
+        <xpath expr="//tbody[hasclass('invoice_tbody')]//tr//td[2]" position="after">
+            <td name="td_uom_note" class="text-end">
+                <span t-field="line.uom_note"/>
+            </td>
+        </xpath>
+    </template>
+</odoo>
