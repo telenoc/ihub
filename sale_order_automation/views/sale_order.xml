@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="amb_sale_view_inherit" model="ir.ui.view">
+            <field name="name">amb.sale.order.form.inherit.sale</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='order_line']/tree[1]/field[@name='product_packaging_qty']" position="before">
+                    <field name="uom_note" optional="show" />
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>

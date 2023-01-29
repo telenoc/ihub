@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="amb-account_move_inherit" model="ir.ui.view">
+            <field name="name">amb.account.move.form.inherit.invoice</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_move_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='invoice_line_ids']/tree[1]/field[@name='product_uom_id']" position="after">
+                    <field optional="show" name="uom_note" />
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

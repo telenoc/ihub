@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="sale_report_inherit" inherit_id="sale.report_saleorder_document">
+        <xpath expr="//table[hasclass('o_main_table')]/thead/tr/th[@name='th_quantity']" position="after">
+            <th name="th_uom_note" class="text-end">UOM Note</th>
+        </xpath>
+        <xpath expr="//tbody[hasclass('sale_tbody')]//tr//td[@name='td_quantity']" position="after">
+            <td name="td_uom_note" class="text-end">
+                <span t-field="line.uom_note"/>
+            </td>
+        </xpath>
+    </template>
+</odoo>
