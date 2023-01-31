@@ -1,0 +1,534 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="custom_internal_layout" inherit_id="web.internal_layout">
+        <xpath expr="//div[hasclass('header')]" position="replace" />
+    </template>
+    <template id="report_invoice_document">
+        <t t-call="arabic_taxable_invoice_knk.custom_internal_layout">
+            <t t-set="o" t-value="o.with_context(lang=lang)" />
+            <style>
+                @font-face {
+                font-family: 'Tajawal-Black';
+                src: local('Tajawal'), local('Tajawal'), url(/arabic_taxable_invoice_knk/static/src/fonts/Tajawal-Black.ttf)
+                format('opentype');
+                }
+                @font-face {
+                font-family: 'Tajawal-Bold';
+                src: local('Tajawal'), local('Tajawal'), url(/arabic_taxable_invoice_knk/static/src/fonts/Tajawal-Bold.ttf)
+                format('opentype');
+                }
+                @font-face {
+                font-family: 'Tajawal-ExtraBold';
+                src: local('Tajawal'), local('Tajawal'),
+                url(/arabic_taxable_invoice_knk/static/src/fonts/Tajawal-ExtraBold.ttf) format('opentype');
+                }
+                @font-face {
+                font-family: 'ExtraLigh';
+                src: local('Tajawal'), local('Tajawal'),
+                url(/arabic_taxable_invoice_knk/static/src/fonts/Tajawal-ExtraLigh.ttf) format('opentype');
+                }
+                @font-face {
+                font-family: 'Tajawal-Light';
+                src: local('Tajawal'), local('Tajawal'), url(/arabic_taxable_invoice_knk/static/src/fonts/Tajawal-Light.ttf)
+                format('opentype');
+                }
+                @font-face {
+                font-family: 'Tajawal-Medium';
+                src: local('Tajawal'), local('Tajawal'), url(/arabic_taxable_invoice_knk/static/src/fonts/Tajawal-Medium.ttf)
+                format('opentype');
+                }
+                @font-face {
+                font-family: 'Tajawal-Regular';
+                src: local('Tajawal'), local('Tajawal'),
+                url(/arabic_taxable_invoice_knk/static/src/fonts/Tajawal-Regular.ttf) format('opentype');
+                }
+                .regular{
+                font-family: Tajawal-Regular;
+                }
+                .black{
+                font-family: Tajawal-Black !important;
+                /*font-weight: bold;*/
+                }
+                .light{
+                font-family: Tajawal-Light;
+                }
+                .address_block span{
+                line-height: initial !important;
+                }
+                .table-border {
+                    border: 1px solid !important;
+                }
+                table{
+                    margin-bottom: 3px !important;
+                }
+                .product_block td{
+                    border-right: 1px solid;
+                    border-left: 1px solid;
+
+                    border-top: 0px !important;
+                    <!-- padding: 5px 0px 5px 0px !important; -->
+                }
+                .table tr td{
+                        padding: 0.2rem 0.2rem !important;
+                }
+            </style>
+            <div class="page">
+                <div class="header">
+                    <table class="table table-bordered" style="border: 2px solid white;width: 100%;">
+                        <tr>
+                            <td width="35%" style="border: 1px solid white;">
+                                <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="max-height: 120px;" alt="Logo" />
+                            </td>
+                            <td width="25%" style="border: 1px solid white;text-align:right;">
+                                <img t-att-src="'/report/barcode/?barcode_type=%s&amp;value=%s&amp;width=%s&amp;height=%s'%('QR', o.l10n_ar_qr_data, 140, 140)" style="max-height: 140px;" />
+                            </td>
+                            <td width="40%">
+                                <div style="text-align: right;font-size: 20px;" class="black">
+                                    <t t-out="o.company_id.knk_header1 or ''" />
+                                </div>
+                                <div style="text-align: right;font-size: 20px;" class="black">
+                                    <t t-out="o.company_id.knk_header2 or ''" />
+                                </div>
+                                <div style="text-align: right;font-size: 14px;" class="black">
+                                    <t t-out="o.company_id.knk_header3 or ''" />
+                                </div>
+                                <div style="text-align: right;font-size: 14px;" class="black">
+                                    <t t-out="o.company_id.knk_header4 or ''" />
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                    <div class="regular text-center" style="text-align:right;width:100%;">
+                        <t t-if="o.move_type in ('out_refund', 'in_refund')">
+                            <span>Return Invoice فاتورة مرتجعات</span>
+                        </t>
+                        <t t-else="o.move_type in ('out_invoice', 'in_invoice')">
+                            <span>Tax Invoice فاتورة ضريبية</span>
+                        </t>
+                    </div>
+                    <style>
+                        .table-border {
+                        border: 1px solid !important;
+                        }
+                        table{
+                        margin-bottom: 3px !important;
+                        }
+                        .product_block td{
+                        border-right: 1px solid;
+
+                        border-top: 0px !important;
+                        <!-- padding: 5px 0px 5px 0px !important; -->
+                        }
+                        .table tr td{
+                            padding: 0.2rem 0.2rem !important;
+                        }
+                    </style>
+                    <!-- Table 1 -->
+                    <table class="table table-bordered">
+                        <tbody style="font-size: 14px;">
+                            <tr>
+                                <td class="text-center table-border black">Vendor</td>
+                                <td colspan="4" class="table-border text-center regular">
+                                    <t t-out="o.company_id.name" />
+                                </td>
+                                <td class="black text-left table-border">اسم المورد</td>
+                            </tr>
+                            <tr>
+                                <td class="td-1 text-center table-border black" width="10%" style="background-color: #dfdfdf;">
+                                    Inv No.
+                                </td>
+                                <td class="td-2 table-border text-center regular" width="20%">
+                                    <span t-field="o.name" />
+                                </td>
+                                <td class="td-3 text-left table-border black" width="12%" style="background-color: #dfdfdf;">
+                                    رقم الفاتورة
+                                </td>
+                                <td class="td-4 text-center table-border black" width="10%" style="background-color: #dfdfdf;">
+                                    Address
+                                </td>
+                                <td class="td-5 table-border text-center regular" style="font-size: 12px;" width="32%">
+                                    <div>
+                                        <span t-out="docs.get_address(o.company_id, company=True)[:42]" />
+                                    </div>
+                                </td>
+                                <td class="td-6 text-left table-border black" width="16%" style="background-color: #dfdfdf;">
+                                    عنوان المورد
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="td-1 text-center table-border black" style="background-color: #dfdfdf;">Inv.
+                                    Date
+                                </td>
+                                <td class="td-2 table-border text-center regular">
+                                    <span t-field="o.invoice_date" />
+                                </td>
+                                <td class="td-3 text-left table-border black" style="background-color: #dfdfdf;">تاريخ
+                                    الإصدار
+                                </td>
+                                <td class="td-4 text-center table-border  black" style="background-color: #dfdfdf;">VAT.
+                                    No
+                                </td>
+                                <td class="td-5 table-border text-center regular">
+                                    <span t-field="o.company_id.vat" />
+                                </td>
+                                <td class="td-6 text-left table-border black" style="background-color: #dfdfdf;">الرقم
+                                    الضريبي
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="td-1 text-center table-border black" style="background-color: #dfdfdf;">
+                                    Delivery
+                                </td>
+                                <td class="td-2 table-border text-center regular">
+                                    <span t-if="o.invoice_date" t-out="o.invoice_date" />
+                                </td>
+                                <td class="td-3 text-left table-border black" style="background-color: #dfdfdf;">تاريخ
+                                    التوريد
+                                </td>
+                                <td class="td-4 text-center table-border black" style="background-color: #dfdfdf;">Due
+                                    Date
+                                </td>
+                                <td class="td-5 table-border text-center regular">
+                                    <span t-field="o.invoice_date_due" />
+                                </td>
+                                <td class="td-6 text-left table-border black" style="background-color: #dfdfdf;">تاريخ
+                                    الاستحقاق
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="td-1 text-center table-border black" style="background-color: #dfdfdf;">Inv.
+                                    Type
+                                </td>
+                                <td class="td-2 table-border text-center regular">
+                                    <t t-if="o.invoice_payment_term_id
+                                        " t-out="o.invoice_payment_term_id.name[:17]" />
+                                </td>
+                                <td class="td-3 text-left table-border black" style="background-color: #dfdfdf;">نوع
+                                    الفاتورة
+                                </td>
+                                <td class="td-4 text-center table-border black" style="background-color: #dfdfdf;">Ref
+                                </td>
+                                <td class="td-5 table-border text-center regular">
+                                    <t t-out="o.ref" />
+                                </td>
+                                <td class="td-6 text-left table-border black" style="background-color: #dfdfdf;">
+                                    المرجع
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <!-- Table 2 -->
+                    <table class="table table-bordered">
+                        <tbody style="font-size: 14px;">
+                            <tr>
+                                <td class="text-center table-border black" style="background-color: #dfdfdf;">Customer
+                                </td>
+                                <td colspan="4" class="table-border text-center regular">
+                                    <span t-field="o.partner_id" />
+                                </td>
+                                <td class="text-left table-border black" style="background-color: #dfdfdf;" width="17%">اسم
+                                    العميل
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center table-border black" style="background-color: #dfdfdf;">Address
+                                </td>
+                                <td colspan="4" class="table-border text-center regular" style="font-size: 12px;">
+                                    <span t-out="docs.get_address(o.partner_id)" />
+                                </td>
+                                <td class="text-left table-border black" style="background-color: #dfdfdf;" width="17%">عنوان العميل
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="td-1 text-center table-border black" width="10%" style="background-color: #dfdfdf;">PhoneNo.
+                                </td>
+                                <td class="td-2 table-border text-center regular" width="20%">
+                                    <t t-if="o.partner_id.phone">
+                                        <span t-out="o.partner_id.phone[:12]" />
+                                    </t>
+                                </td>
+                                <td class="td-3 text-left table-border black" width="12%" style="background-color: #dfdfdf;">الهاتف
+                                </td>
+                                <td class="td-4 text-center table-border black" width="10%" style="background-color: #dfdfdf;">CR
+                                </td>
+                                <td class="td-5 table-border text-center regular" width="32%">
+                                    <div>
+                                        <span t-out="o.company_id.company_registry" />
+                                    </div>
+                                </td>
+                                <td class="td-6 text-left table-border black" width="16%" style="background-color: #dfdfdf;">السجل التجاري
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="td-1 text-center table-border black" style="background-color: #dfdfdf;">
+                                    Code
+                                </td>
+                                <td class="td-2 text-center table-border black">
+                                    <span t-field="o.partner_id.ref" />
+                                </td>
+                                <td class="td-3 text-left table-border black" style="background-color: #dfdfdf;">رقم
+                                    العميل
+                                </td>
+                                <td class="td-4 text-center table-border black" style="background-color: #dfdfdf;">VAT.
+                                    No
+                                </td>
+                                <td class="td-5 table-border text-center regular">
+                                    <span t-field="o.partner_id.vat" />
+                                </td>
+                                <td class="td-6 text-left table-border black" style="background-color: #dfdfdf;">الرقم
+                                    الضريبي
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <table class="table table-borderless">
+                    <thead style="font-size:15px;">
+                        <tr class="black" style="background-color: #dfdfdf;">
+                            <td class="text-center table-border" width="2%">م</td>
+                            <td class="text-center table-border" width="68%">البيــــــــــــــــان</td>
+                            <td class="text-center table-border" width="6%">العدد</td>
+                            <td class="text-center table-border" width="10%">السعر</td>
+                            <td class="text-center table-border" width="12%">الضريبة</td>
+                            <td class="text-center table-border" width="12%">الإجمالي</td>
+                        </tr>
+                        <tr class="black" style="background-color: #dfdfdf;">
+                            <td class="text-center table-border">S.</td>
+                            <td class="text-center table-border">Description</td>
+                            <td class="text-center table-border">Qty</td>
+                            <td class="text-center table-border">Price</td>
+                            <td class="text-center table-border">VAT</td>
+                            <td class="text-center table-border">Amount</td>
+                        </tr>
+                    </thead>
+                    <tbody style="font-size: 15px;">
+                        <t t-set="line_len" t-value="28" />
+                        <t t-set="len_l" t-value="0" />
+                        <t t-set="inv_l" t-value="0" />
+                        <t t-foreach="o.invoice_line_ids" t-as="l">
+                            <t>
+                                <t t-set="inv_l" t-value="inv_l+1" />
+                            </t>
+                            <t t-set="len_l" t-value="len_l+1" />
+                            <t t-if="line_len - (len_l % line_len) -1 == 0">
+                                <t t-set="td_border_style">
+                                    border-bottom: 2px black;
+                                </t>
+                            </t>
+                            <t t-else="">
+                                <t t-set="td_border_style">
+                                    border-bottom: 0px !important;
+                                </t>
+                            </t>
+                            <tr t-att-class="'regular product_block align-items-center fw-bold o_line_section' if l.display_type == 'line_section' else 'regular product_block align-items-center fst-italic o_line_note' if l.display_type == 'line_note' else 'regular product_block align-items-center'">
+                                <td class="text-center" width="2%">
+                                    <div>
+                                        <span t-out="inv_l" />
+                                    </div>
+                                </td>
+                                <td class="text-center" width="68%">
+                                    <div>
+                                        <span t-out="l.name[:68]" />
+                                    </div>
+                                </td>
+                                <td class="text-center" width="6%">
+                                    <div>
+                                        <span t-out="'{:.2f}'.format(l.quantity)" />
+                                    </div>
+                                </td>
+                                <td class="text-center" width="10%">
+                                    <div>
+                                        <span t-out="'{:.2f}'.format(l.price_unit)" />
+                                    </div>
+                                </td>
+                                <td class="text-center" width="12%">
+                                    <div>
+                                        <span t-out="l.quantity and '{:.2f}'.format((l.price_total- l.price_subtotal)/l.quantity) or 0.0" />
+                                    </div>
+                                </td>
+                                <td class="text-center" width="12%">
+                                    <div>
+                                        <span t-out="'{:.2f}'.format(l.price_subtotal)" />
+                                    </div>
+                                </td>
+                            </tr>
+                        </t>
+                        <t t-set="rem_len" t-value="line_len - (len_l % line_len)" />
+                        <t>
+                            <t t-foreach="rem_len" t-as="line">
+                                <t t-set="len_l" t-value="len_l+1" />
+                                <t t-if="rem_len == line +1 ">
+                                    <t t-set="td_border_style">
+                                        border-bottom: 2px solid;
+                                    </t>
+                                </t>
+                                <t t-else="">
+                                    <t t-set="td_border_style">
+                                        border-bottom: 0px !important;
+                                    </t>
+                                </t>
+                                <tr class="regular product_block">
+                                    <td class="text-center">
+                                        <div class="address_block mt-2 mb-2">
+                                            <span class="mt-2" />
+                                        </div>
+                                    </td>
+                                    <td t-att-style="td_border_style" />
+                                    <td t-att-style="td_border_style" />
+                                    <td t-att-style="td_border_style" />
+                                    <td t-att-style="td_border_style" />
+                                    <td t-att-style="td_border_style" />
+                                </tr>
+                            </t>
+                        </t>
+                    </tbody>
+                </table>
+                <div class="footer">
+                    <table class="table table-bordered">
+                        <tbody style="font-size: 14px;">
+                            <tr>
+                                <td width="25%" class="text-center regular" style="border-bottom: hidden;border-top:1px solid black;border-right:1px solid;border-left:1px solid;background-color: #dfdfdf;">
+                                </td>
+                                <td width="25%" class="text-end black" style="border-right: hidden;border-top:1px solid black;background-color: #dfdfdf;border-bottom:1px solid;">The
+                                    taxable amount
+                                </td>
+                                <td width="25%" class="text-left black" style="background-color: #dfdfdf;border-bottom:1px solid;border-top:1px solid black;border-right: 1px solid;">
+                                    المبلغ الخاضع للضريبة
+                                </td>
+                                <td class="regular table-border" width="25%" style="border-right: 1px solid;border-bottom:1px solid;border-top:1px solid black;background-color: #dfdfdf;">
+                                    <span t-field="o.amount_untaxed" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center regular" style="border-bottom: hidden;border-right:1px solid;border-left:1px solid;background-color: #dfdfdf;">
+                                </td>
+                                <td class="text-end black" style="border-right: hidden;background-color: #dfdfdf;border-bottom:1px solid;">
+                                    Discount
+                                </td>
+                                <td class="text-left black" style="background-color: #dfdfdf;border-bottom:1px solid;border-right: 1px solid;">
+                                    الخصم
+                                </td>
+                                <td class="regular table-border" style="border-right: 1px solid;border-bottom:1px solid;background-color: #dfdfdf;">
+                                    <span t-out="docs.get_total_discount()" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="border-bottom: hidden;border-right:1px solid;border-left:1px solid;background-color: #dfdfdf;"></td>
+                                <td class="text-end black" style="border-right: hidden;background-color: #dfdfdf;border-bottom:1px solid;">
+                                    Amount after Discount
+                                </td>
+                                <td class="text-left black" style="background-color: #dfdfdf;border-bottom:1px solid;border-right: 1px solid;">
+                                    الصافي بعد الخصم
+                                </td>
+                                <td class="regular table-border" style="border-right: 1px solid;border-bottom:1px solid;background-color: #dfdfdf;">
+                                    <span t-field="o.amount_untaxed" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="border-bottom: hidden;border-right:1px solid;border-left:1px solid;background-color: #dfdfdf;" />
+                                <td class="text-end black" style="border-right: hidden;background-color: #dfdfdf;border-bottom:1px solid;">VAT
+                                    Amount 15%
+                                </td>
+                                <td class="text-left black" style="background-color: #dfdfdf;border-bottom:1px solid;border-right: 1px solid;">
+                                    <span>15%</span>
+                                    <span>مبلغ الضريبة</span>
+                                </td>
+                                <td class="regular table-border" style="border-right: 1px solid;border-bottom:1px solid;background-color: #dfdfdf;">
+                                    <span t-field="o.amount_tax" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center regular table-border" style="border-left:1px solid;background-color: #dfdfdf;border-right: 1px solid;border-bottom:1px solid;">
+                                    <span class="page" />/<span class="topage" />صفحة
+                                </td>
+                                <td class="text-end black" style="border-right: hidden;background-color: #dfdfdf;border-bottom:1px solid;">
+                                    Total Amount with VAT
+                                </td>
+                                <td class="text-left black" style="background-color: #dfdfdf;border-bottom:1px solid;border-right: 1px solid;">
+                                    اجمالي المبلغ مع الضريبة
+                                </td>
+                                <td class="regular table-border" style="border-right: 1px solid;border-bottom:1px solid;background-color: lightgray;">
+                                    <span t-field="o.amount_total" />
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <!-- Table 4 -->
+                    <table class="table table-bordered">
+                        <tbody style="font-size: 14px;">
+                            <tr class="black">
+                                <td class="td-13 text-center table-border" style="background-color: #dfdfdf;border-top:1px solid black;border-right:1px solid;border-bottom:1px solid;border-left:1px solid black;">Salesman
+                                </td>
+                                <td class="td-14 text-center table-border" style="background-color: #dfdfdf;border-right:1px solid;border-top:1px solid black;border-bottom:1px solid;">Approved
+                                    by:
+                                </td>
+                                <td class="td-15 text-center table-border" style="background-color: #dfdfdf;border-right:1px solid;border-top:1px solid black;border-bottom:1px solid;">Received
+                                    by:
+                                </td>
+                                <td class="td-16 text-center table-border" style="background-color: #dfdfdf;border-top:1px solid black;border-bottom:1px solid;">Customer
+                                    signature
+                                </td>
+                            </tr>
+                            <tr class="black">
+                                <td class="td-13 text-center table-border" style="background-color: #dfdfdf;border-right:1px solid;border-bottom:1px solid;border-left:1px solid black;">البائع
+                                </td>
+                                <td class="td-14 text-center table-border" style="background-color: #dfdfdf;border-right:1px solid;border-bottom:1px solid;">اعتمد
+                                    بواسطة
+                                </td>
+                                <td class="td-15 text-center table-border" style="background-color: #dfdfdf;border-right:1px solid;border-bottom:1px solid;">استلم
+                                    بواسطة
+                                </td>
+                                <td class="td-16 text-center table-border" style="background-color: #dfdfdf;border-right:1px solid;border-bottom:1px solid;">توقيع
+                                    العميل
+                                </td>
+                            </tr>
+                            <tr class="regular" style="border-right:1px solid;">
+                                <td class="td-13 text-center table-border" style="border-right:1px solid;border-bottom:1px solid;border-left:1px solid black;">
+                                    <span t-field="o.user_id" />
+                                </td>
+                                <td class="td-14 table-border" style="border-right:1px solid;border-bottom:1px solid;">
+                                    <br />
+                                    <br />
+                                    <br />
+                                </td>
+                                <td class="td-15 table-border" style="border-right:1px solid;border-bottom:1px solid;">
+                                    <br />
+                                    <br />
+                                    <br />
+                                </td>
+                                <td class="td-16 table-border" style="border-right:1px solid;border-bottom:1px solid;">
+                                    <br />
+                                    <br />
+                                    <br />
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="text-center">
+                        <span class="text-center" style="text-align: center">
+                            <t t-out="o.company_id.knk_footer" />
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+    <template id="report_invoice">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-set="lang" t-value="o.user_id.sudo().lang if o.move_type in ('in_invoice', 'in_refund') else o.partner_id.lang" />
+                <t t-call="arabic_taxable_invoice_knk.report_invoice_document" t-lang="lang" />
+            </t>
+        </t>
+    </template>
+    <record id="invoice_form_inherit_sale_stock" model="ir.ui.view">
+        <field name="name">account.move.form.sale.stock</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form" />
+        <field name="arch" type="xml">
+            <field name="invoice_date" position="after">
+                <field name="invoice_date" />
+            </field>
+        </field>
+    </record>
+</odoo>
