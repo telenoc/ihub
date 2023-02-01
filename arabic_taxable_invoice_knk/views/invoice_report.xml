@@ -286,8 +286,9 @@
                     <thead style="font-size:15px;">
                         <tr class="black" style="background-color: #dfdfdf;">
                             <td class="text-center table-border" width="2%">م</td>
-                            <td class="text-center table-border" width="68%">البيــــــــــــــــان</td>
+                            <td class="text-center table-border" width="56%">البيــــــــــــــــان</td>
                             <td class="text-center table-border" width="6%">العدد</td>
+                            <td class="text-center table-border" width="12%">العدد الصندوق</td>
                             <td class="text-center table-border" width="10%">السعر</td>
                             <td class="text-center table-border" width="12%">الضريبة</td>
                             <td class="text-center table-border" width="12%">الإجمالي</td>
@@ -296,6 +297,7 @@
                             <td class="text-center table-border">S.</td>
                             <td class="text-center table-border">Description</td>
                             <td class="text-center table-border">Qty</td>
+                            <td class="text-center table-border">Qty Box</td>
                             <td class="text-center table-border">Price</td>
                             <td class="text-center table-border">VAT</td>
                             <td class="text-center table-border">Amount</td>
@@ -326,7 +328,7 @@
                                         <span t-out="inv_l" />
                                     </div>
                                 </td>
-                                <td class="text-center" width="68%">
+                                <td class="text-center" width="56%">
                                     <div>
                                         <span t-out="l.name[:68]" />
                                     </div>
@@ -334,6 +336,11 @@
                                 <td class="text-center" width="6%">
                                     <div>
                                         <span t-out="'{:.2f}'.format(l.quantity)" />
+                                    </div>
+                                </td>
+                                <td class="text-center" width="12%">
+                                    <div>
+                                        <span t-out="l.uom_note" />
                                     </div>
                                 </td>
                                 <td class="text-center" width="10%">
@@ -368,11 +375,12 @@
                                     </t>
                                 </t>
                                 <tr class="regular product_block">
-                                    <td class="text-center">
+                                    <td class="text-center" t-att-style="td_border_style">
                                         <div class="address_block mt-2 mb-2">
                                             <span class="mt-2" />
                                         </div>
                                     </td>
+                                    <td t-att-style="td_border_style" />
                                     <td t-att-style="td_border_style" />
                                     <td t-att-style="td_border_style" />
                                     <td t-att-style="td_border_style" />

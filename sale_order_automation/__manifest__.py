@@ -15,7 +15,7 @@
     'website': 'https://www.craftsync.com/',
     'license': 'LGPL-3',
     'support':'info@craftsync.com',
-    'depends' : ['sale_management', 'stock'],
+    'depends' : ['sale_management', 'stock', 'account'],
     'data': [
         'reports/sale_report_inherit.xml',
         'reports/invoice_reprot_inherit.xml',
