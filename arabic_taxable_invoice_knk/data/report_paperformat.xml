@@ -6,12 +6,12 @@
             <field name="default" eval="False" />
             <field name="format">A4</field>
             <field name="orientation">Portrait</field>
-            <field name="margin_top">95</field>
+            <field name="margin_top">110</field>
             <field name="margin_bottom">90</field>
             <field name="margin_left">5</field>
             <field name="margin_right">5</field>
             <field name="header_line" eval="False" />
-            <field name="header_spacing">95</field>
+            <field name="header_spacing">110</field>
         </record>
     </data>
 </odoo>
