@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<odoo>
+    <data noupdate="0">
+
+        <record model="ir.cron" id="cron_send_buyer_monthly_statement">
+            <field name="name">Scheduled Action to Send Customer Monthly Statement</field>
+            <field name="model_id" ref="model_res_partner"/>
+            <field name="active">True</field>
+            <field name="doall" eval="False"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_send_buyer_monthly_statements()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">months</field>
+            <field name="numbercall">-1</field>
+        </record>
+
+        <record model="ir.cron" id="cron_send_buyer_weekly_statement">
+            <field name="name">Scheduled Action to Send Customer Weekly Statement</field>
+            <field name="model_id" ref="model_res_partner"/>
+            <field name="doall" eval="False"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_send_buyer_weekly_statements()</field>
+            <field name="active">True</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">weeks</field>
+            <field name="numbercall">-1</field>
+        </record>
+
+        <record model="ir.cron" id="cron_send_buyer_overdue_statements">
+            <field name="name">Scheduled Action to Send Customer Overdue Statement</field>
+            <field name="model_id" ref="model_res_partner"/>
+            <field name="doall" eval="False"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_send_buyer_overdue_statements()</field>
+            <field name="active">True</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">months</field>
+            <field name="numbercall">-1</field>
+        </record>
+    </data>
+</odoo>

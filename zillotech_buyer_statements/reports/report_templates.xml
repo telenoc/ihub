@@ -1,0 +1,1587 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="buyer_statement_template">
+            <t t-set="company" t-value="partner.env.company" />
+            <t t-set="partner" t-value="partner.with_context({'lang':partner.lang})" />
+            <div class="col-xs-4">
+                <div class="pull-right">
+                    <div class="pull-right">
+                        <p>
+                            <section>
+                                <span t-if='partner.name' t-esc="partner.name" />&amp;nbsp;
+                                <br />
+                            </section>
+                            <section>
+                                <span t-if='partner.street' t-esc="partner.street" />&amp;nbsp;
+                                <span t-if='partner.street2' t-esc="partner.street2" />&amp;nbsp;
+                                <br />
+                            </section>
+                            <section>
+                                <span t-if='partner.city' t-esc="partner.city" />&amp;nbsp;
+                                <span t-if='partner.state_id.name' t-esc="partner.state_id.name" />&amp;nbsp;
+                                <span t-if='partner.zip' t-esc="partner.zip" />&amp;nbsp;
+                                <br />
+                            </section>
+                            <section>
+                                <span t-if='partner.country_id.name' t-esc="partner.country_id.name" />
+                                <br />
+                            </section>
+                        </p>
+                    </div>
+                </div>
+                <br />
+            </div>
+            <div class="page">
+                <div class="container" style="margin:5px 0 0 1px;">
+                    <strong>
+                        <span>Date :</span>
+                    </strong>
+                    <span t-esc="datetime.datetime.now().strftime('%m/%d/%Y')" />
+                </div>
+                <br />
+                <br />
+                <table class="table table-condensed">
+                    <thead>
+                        <tr class="text-center">
+                            <th colspan="2">Date</th>
+                            <th>Name</th>
+                            <th>Reference</th>
+                            <th>Invoices/Debit</th>
+                            <th>Payments/Credit</th>
+                            <th>Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="2" />
+                            <td>
+                                <b>Initial Balance</b>
+                            </td>
+                            <td colspan="3" />
+                            <td class="text-right">
+                                <b>
+                                    <span t-esc="0.0" t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}" />
+                                </b>
+                            </td>
+                        </tr>
+                        <t t-set="balance" t-value="0.0" />
+                        <t t-set="balance_sub_total" t-value="0.0" />
+                        <tr t-foreach="content_dict['field_datas']" t-as="data">
+                            <t t-set="balance" t-value="balance + balance_sub_total " />
+                            <td colspan="2">
+                                <span t-field="data.invoice_date" t-options='{"widget": "date", "format": "MM-dd-yyyy"}' />
+                            </td>
+                            <td>
+                                <span t-esc="data.name" />
+                            </td>
+                            <td>
+                                <span t-esc="data.partner_id.ref" />
+                            </td>
+                            <td class="text-right">
+                                <span t-esc="data.amount_total_signed" t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}" />
+                            </td>
+                            <td class="text-right">
+                                <span t-esc="data.credit_payment" t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}" />
+                            </td>
+                            <td class="text-right">
+                                <t t-set="balance_sub_total" t-value="data.amount_total_signed-data.credit_payment" />
+                                <span t-esc="balance_sub_total + balance" t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" />
+                            <td>
+                                <b>Ending Balance</b>
+                            </td>
+                            <td colspan="3" />
+                            <td class="text-right">
+                                <b>
+                                    <span t-esc="content_dict['total_balance_amount']" t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}" />
+                                </b>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" />
+                            <td></td>
+                            <td></td>
+                            <td class="text-right">
+                                <span t-esc="content_dict['total_amount_signed']" t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}" />
+                            </td>
+                            <td class="text-right">
+                                <span t-esc="content_dict['total_credit_amount']" t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}" />
+                            </td>
+                            <td class="text-right">
+                                <span t-esc="content_dict['total_balance_amount']" t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}" />
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="row">
+                    <div t-if="partner.disable_global_notes" class="col-6 pull-left">
+                        <table t-attf-class="table table-sm" name="internal_table">
+                            <tbody>
+                                <tr t-if="partner.nck_internal_notes">
+                                    <td colspan="6">
+                                        <pre t-esc="partner.nck_internal_notes" />
+                                        </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div t-else="" class="col-6 pull-left">
+                        <table t-attf-class="table table-sm" name="internal_table">
+                            <tbody>
+                                <tr t-if="partner.env.company.global_note">
+                                    <td colspan="6">
+                                        <pre t-esc="partner.env.company.global_note"/>
+                                    </td>
+                                </tr>
+                                <tr t-if="partner.nck_internal_notes">
+                                    <td colspan="6">
+                                        <pre t-esc="partner.nck_internal_notes"/>
+                                    </td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="row col-6">
+                        <div class="col-3 pull-left">
+                            <div>
+                                <img t-if="partner.qr_code" t-att-src="image_data_uri(partner.qr_code)" style="width: 60px; height: auto;"/>
+                            </div>
+                            <br/>
+                            <div style="margin-top: -12px;">
+                                <em>
+                                    <a t-attf-href="/report/statements/#{slug(partner)}">Pay Now</a>
+                                </em>
+                            </div>
+                        </div>
+                        <div class="col-9 pull-right">
+                            <table class="table table-condensed">
+                                <tr class="border-black">
+                                    <td>
+                                        <strong>Total Amount OverDue :</strong>
+                                    </td>
+                                    <td class="text-right">
+                                        <strong>
+                                            <span t-field="partner.buyer_amount_overdue_payment"
+                                                  t-options='{"widget": "monetary", "display_currency": partner.env.company.currency_id}'/>
+                                        </strong>
+                                    </td>
+                                </tr>
+                                <tr class="border-black">
+                                    <td>
+                                        <strong>Balance Due :</strong>
+                                    </td>
+                                    <td class="text-right">
+                                        <strong>
+                                            <span t-field="partner.buyer_amount_due_payment"
+                                                  t-options='{"widget": "monetary", "display_currency": partner.env.company.currency_id}'/>
+                                        </strong>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <br/>
+                <table t-attf-class="table table-sm" name="days_table">
+                    <thead>
+                        <tr>
+                            <th>0-30</th>
+                            <th>30-60</th>
+                            <th>60-90</th>
+                            <th>90+</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tr>
+                        <td>
+                            <span t-esc="partner.aged_analysis_f_thirty"
+                                  t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                        </td>
+                        <td>
+                            <span t-esc="partner.aged_analysis_t_sixty"
+                                  t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                        </td>
+                        <td>
+                            <span t-esc="partner.aged_analysis_s_ninety"
+                                  t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                        </td>
+                        <td>
+                            <span t-esc="partner.aged_analysis_ninety_plus"
+                                  t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                        </td>
+                        <td>
+                            <span t-esc="partner.aged_analysis_total"
+                                  t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </template>
+
+        <template id="buyer_filter_statement_template">
+            <t t-set="company" t-value="partner.env.company"/>
+            <t t-set="partner" t-value="partner.with_context({'lang':partner.lang})"/>
+            <div class="col-xs-4">
+                <div class="pull-right">
+                    <div class="pull-left">
+                        <p>
+                            <section>
+                                <span t-if='partner.name' t-esc="partner.name"/>&amp;nbsp;
+                                <br/>
+                            </section>
+                            <section>
+                                <span t-if='partner.street' t-esc="partner.street"/>&amp;nbsp;
+                                <span t-if='partner.street2' t-esc="partner.street2"/>&amp;nbsp;
+                                <br/>
+                            </section>
+                            <section>
+                                <span t-if='partner.city' t-esc="partner.city"/>&amp;nbsp;
+                                <span t-if='partner.state_id.name' t-esc="partner.state_id.name"/>&amp;nbsp;
+                                <span t-if='partner.zip' t-esc="partner.zip"/>&amp;nbsp;
+                                <br/>
+                            </section>
+                            <section>
+                                <span t-if='partner.country_id.name' t-esc="partner.country_id.name"/>
+                                <br/>
+                            </section>
+                        </p>
+                    </div>
+                </div>
+                <br/>
+            </div>
+            <div class="page">
+                <div class="container mt16 mb16" style="margin-left:5px;">
+                    <t t-if="partner.buyer_statement_date_to">
+                        <strong>
+                            <span>From :</span>
+                        </strong>
+                        <span t-esc="partner.buyer_statement_date_from"/>
+                    </t>
+                    <t t-if="partner.buyer_statement_date_to">
+                        <strong style="margin-left:10px;">
+                            <span>To :</span>
+                        </strong>
+                        <span t-esc="partner.buyer_statement_date_to"/>
+                    </t>
+                </div>
+                <br/>
+                <br/>
+                <table class="table table-condensed">
+                    <thead>
+                        <tr class="text-center">
+                            <th colspan="2">Date</th>
+                            <th>Name</th>
+                            <th>Reference</th>
+                            <th>Invoices/Debit</th>
+                            <th>Payments/Credit</th>
+                            <th>Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="2"/>
+                            <td>
+                                <b>Initial Balance</b>
+                            </td>
+                            <td colspan="3"/>
+                            <td class="text-right">
+                                <b>
+                                    <span t-esc="partner.buyer_initial_balance"
+                                          t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                                </b>
+                            </td>
+                        </tr>
+                        <t t-set="balance" t-value="0.0"/>
+                        <t t-set="all_total" t-value="0.0"/>
+                        <t t-set="balance_sub_total" t-value="partner.buyer_initial_balance"/>
+                        <tr t-foreach="content_dict['field_datas']" t-as="data">
+                            <t t-set="balance" t-value="balance + balance_sub_total "/>
+                            <td colspan="2">
+                                <span t-field="data.invoice_date"
+                                      t-options='{"widget": "date", "format": "MM-dd-yyyy"}'/>
+                            </td>
+                            <td>
+                                <span t-esc="data.reference"/>
+                            </td>
+                            <td>
+                                <span t-esc="data.partner_id.ref"/>
+                            </td>
+                            <td class="text-right">
+                                <span t-esc="data.amount_total_signed"
+                                      t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                            </td>
+                            <td class="text-right">
+                                <span t-esc="data.credit_payment"
+                                      t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                            </td>
+                            <td class="text-right">
+                                <t t-set="balance_sub_total" t-value="data.amount_total_signed-data.credit_payment"/>
+                                <t t-set="all_total" t-value="balance_sub_total + balance"/>
+                                <span t-esc="balance_sub_total + balance"
+                                      t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2"/>
+                            <td>
+                                <b>Ending Balance</b>
+                            </td>
+                            <td colspan="3"/>
+                            <td class="text-right">
+                                <b>
+                                    <span t-esc="all_total"
+                                          t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                                </b>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-right"/>
+                            <td/>
+                            <td/>
+                            <td/>
+                            <td class="text-right">
+                                <span t-esc="content_dict['total_amount_signed']"
+                                      t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                            </td>
+                            <td class="text-right">
+                                <span t-esc="content_dict['total_credit_amount']"
+                                      t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                            </td>
+                            <td class="text-right">
+                                <span t-esc="all_total"
+                                      t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+
+                <div class="col-xs-4">
+                    <div t-if="partner.disable_global_notes" class="pull-left">
+                        <table t-attf-class="table table-sm" name="internal_table">
+                            <tbody>
+                                <tr t-if="partner.nck_internal_notes">
+                                    <td colspan="6">
+                                        <pre t-esc="partner.nck_internal_notes"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div t-else="" class="pull-left">
+                        <table t-attf-class="table table-sm" name="internal_table">
+                            <tbody>
+                                <tr t-if="partner.env.company.global_note">
+                                    <td colspan="6">
+                                        <pre t-esc="partner.env.company.global_note"/>
+                                    </td>
+                                </tr>
+                                <tr t-if="partner.nck_internal_notes">
+                                    <td colspan="6">
+                                        <pre t-esc="partner.nck_internal_notes"/>
+                                    </td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pull-right">
+                        <div class="col-xs-4">
+                            <div class="pull-left" style="margin-right: 30px;margin-bottom: 40px;">
+                                <div>
+                                    <img t-if="partner.qr_code"
+                                         t-att-src="image_data_uri(partner.qr_code)"
+                                         style="width: 60px; height: auto;"/>
+                                </div>
+                                <br/>
+                                <div style="margin-top: -20px;">
+                                    <em>
+                                        <a t-attf-href="/report/statements/#{slug(partner)}">Pay Now</a>
+                                    </em>
+                                </div>
+                            </div>
+                            <div class="pull-right">
+                                <table class="table table-condensed">
+                                    <tr class="border-black">
+                                        <td>
+                                            <strong>Total Amount OverDue :</strong>
+                                        </td>
+                                        <td class="text-right">
+                                            <strong>
+                                                <span t-field="partner.buyer_amount_overdue_payment"
+                                                      t-options='{"widget": "monetary", "display_currency": partner.env.company.currency_id}'/>
+                                            </strong>
+                                        </td>
+                                    </tr>
+                                    <tr class="border-black">
+                                        <td>
+                                            <strong>Balance Due :</strong>
+                                        </td>
+                                        <td class="text-right">
+                                            <strong>
+                                                <span t-field="partner.buyer_amount_due_payment"
+                                                      t-options='{"widget": "monetary", "display_currency": partner.env.company.currency_id}'/>
+                                            </strong>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br/>
+                <br/>
+                <table t-attf-class="table table-sm" name="days_table">
+                    <thead>
+                        <tr>
+                            <th/>
+                            <th>0-30</th>
+                            <th>30-60</th>
+                            <th>60-90</th>
+                            <th>90+</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tr>
+                        <td/>
+                        <td>
+                            <span t-esc="partner.aged_analysis_f_thirty"
+                                  t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                        </td>
+                        <td>
+                            <span t-esc="partner.aged_analysis_t_sixty"
+                                  t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                        </td>
+                        <td>
+                            <span t-esc="partner.aged_analysis_s_ninety"
+                                  t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                        </td>
+                        <td>
+                            <span t-esc="partner.aged_analysis_ninety_plus"
+                                  t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                        </td>
+                        <td>
+                            <span t-esc="partner.aged_analysis_total"
+                                  t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </template>
+
+        <template id="buyer_overdue_statement_template">
+            <t t-set="company" t-value="partner.env.company"/>
+            <t t-set="partner" t-value="partner.with_context({'lang':partner.lang})"/>
+            <div class="col-xs-4">
+                <div class="pull-right">
+                    <div class="pull-left">
+                        <p>
+                            <section>
+                                <span t-if='partner.name' t-esc="partner.name"/>&amp;nbsp;
+                                <br/>
+                            </section>
+                            <section>
+                                <span t-if='partner.street' t-esc="partner.street"/>&amp;nbsp;
+                                <span t-if='partner.street2' t-esc="partner.street2"/>&amp;nbsp;
+                                <br/>
+                            </section>
+                            <section>
+                                <span t-if='partner.city' t-esc="partner.city"/>&amp;nbsp;
+                                <span t-if='partner.state_id.name' t-esc="partner.state_id.name"/>&amp;nbsp;
+                                <span t-if='partner.zip' t-esc="partner.zip"/>&amp;nbsp;
+                                <br/>
+                            </section>
+                            <section>
+                                <span t-if='partner.country_id.name' t-esc="partner.country_id.name"/>
+                                <br/>
+                            </section>
+                        </p>
+                    </div>
+                    <div class="pull-left">
+                        <div>
+                            <img t-if="partner.qr_code"
+                                 t-att-src="image_data_uri(partner.qr_code)"
+                                 style="width: 60px; height: auto;"/>
+                        </div>
+                        <br/>
+                        <div style="margin-top: -20px;">
+                            <em>
+                                <a t-attf-href="/report/statements/#{slug(partner)}">Pay Now</a>
+                            </em>
+                        </div>
+                    </div>
+
+                </div>
+                <br/>
+            </div>
+            <div class="page">
+                <div class="container" style="margin:5px 0 0 1px;">
+                    <strong>
+                        <span>Date :</span>
+                    </strong>
+                    <span t-esc="datetime.datetime.now().strftime('%m/%d/%Y')"/>
+                </div>
+                <br/>
+                <br/>
+                <table class="table table-condensed">
+                    <thead>
+                        <tr>
+                            <th class="text-center">Reference</th>
+                            <th class="text-center">Date</th>
+                            <th class="text-center">Due Date</th>
+                            <th class="text-center">Communication</th>
+                            <th class="text-right">Total</th>
+                            <th class="text-right">Due</th>
+                            <th class="text-right">Paid</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="content_dict['field_datas']" t-as="data">
+                            <td>
+                                <span t-esc="data.name"/>
+                            </td>
+                            <td>
+                                <span t-esc="datetime.datetime.now().strftime('%m-%d-%Y')"/>
+                            </td>
+                            <td>
+                                <span t-field="data.invoice_date_due"
+                                      t-options='{"widget": "date", "format": "MM-dd-yyyy"}'/>
+                            </td>
+                            <td>
+                                <span t-esc="data.name"/>
+                            </td>
+                            <td class="text-right">
+                                <span t-esc="data.amount_total_signed"
+                                      t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                            </td>
+                            <td class="text-right">
+                                <span t-esc="data.balance_due_amount"
+                                      t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                            </td>
+                            <td class="text-right">
+                                <span t-esc="data.credit_payment"
+                                      t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3"/>
+                            <td>
+                                <strong>Sub-Total :</strong>
+                            </td>
+                            <td class="text-right">
+                                <span t-esc="content_dict['total_amount_due']"
+                                      t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                            </td>
+                            <td class="text-right">
+                                <span t-esc="content_dict['total_balance_amount']"
+                                      t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                            </td>
+                            <td class="text-right">
+                                <span t-esc="content_dict['total_paid_amount']"
+                                      t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                            </td>
+                            <td/>
+                        </tr>
+                        <tr>
+                            <td colspan="3"/>
+                            <td>
+                                <strong>Balance :</strong>
+                            </td>
+                            <td/>
+                            <td class="text-right">
+                                <span t-esc="content_dict['total_balance_amount']"
+                                      t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+        </template>
+
+        <template id="supplier_statement_template">
+            <t t-set="company" t-value="partner.env.company"/>
+            <t t-set="partner" t-value="partner.with_context({'lang':partner.lang})"/>
+            <div class="text-right" style="margin-right: 15em;">
+                <p>
+                    <section>
+                        <span t-if='partner.name' t-esc="partner.name"/>&amp;nbsp;
+                        <span t-if='partner.street' t-esc="partner.street"/>&amp;nbsp;
+                        <span t-if='partner.street2' t-esc="partner.street2"/>&amp;nbsp;
+                        <br/>
+                    </section>
+                    <section>
+                        <span t-if='partner.street' t-esc="partner.street"/>&amp;nbsp;
+                        <span t-if='partner.street2' t-esc="partner.street2"/>&amp;nbsp;
+                        <br/>
+                    </section>
+                    <section>
+                        <span t-if='partner.city' t-esc="partner.city"/>&amp;nbsp;
+                        <span t-if='partner.state_id.name' t-esc="partner.state_id.name"/>&amp;nbsp;
+                        <span t-if='partner.zip' t-esc="partner.zip"/>&amp;nbsp;
+                        <span t-if='partner.country_id.name' t-esc="partner.country_id.name"/>
+                        <br/>
+                    </section>
+                    <section>
+                        <span t-if='partner.country_id.name' t-esc="partner.country_id.name"/>
+                        <br/>
+                    </section>
+                </p>
+                <br/>
+            </div>
+            <div class="page">
+                <div class="container" style="margin:5px 0 0 1px;">
+                    <strong>
+                        <span>Date :</span>
+                    </strong>
+                    <span t-esc="datetime.datetime.now().strftime('%m/%d/%Y')"/>
+                </div>
+                <br/>
+                <br/>
+                <table class="table table-condensed">
+                    <thead>
+                        <tr class="text-center">
+                            <th colspan="2">Date</th>
+                            <th>Name</th>
+                            <th>Reference</th>
+                            <th>Invoices/Debit</th>
+                            <th>Payments/Credit</th>
+                            <th>Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+
+                            <td colspan="2"/>
+                            <td>
+                                <b>Initial Balance</b>
+                            </td>
+                            <td colspan="3"/>
+                            <td class="text-right">
+                                <b>
+                                    <span t-esc="0.0"
+                                          t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                                </b>
+                            </td>
+                        </tr>
+                        <t t-set="balance" t-value="0.0"/>
+                        <t t-set="balance_sub_total" t-value="0.0"/>
+                        <tr t-foreach="content_dict['field_datas']" t-as="data">
+                            <t t-set="balance" t-value="balance + balance_sub_total "/>
+                            <td colspan="2">
+                                <span t-field="data.invoice_date"
+                                      t-options='{"widget": "date", "format": "MM-dd-yyyy"}'/>
+                            </td>
+                            <td>
+                                <span t-esc="data.name"/>
+                            </td>
+                            <td>
+                                <span t-esc="data.partner_id.ref"/>
+                            </td>
+                            <td class="text-right">
+                                <span t-esc="data.amount_total_signed"
+                                      t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                            </td>
+                            <td class="text-right">
+                                <span t-esc="data.credit_payment"
+                                      t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                            </td>
+                            <td class="text-right">
+                                <t t-set="balance_sub_total" t-value="data.amount_total_signed-data.credit_payment"/>
+                                <span t-esc="balance_sub_total + balance"
+                                      t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2"/>
+                            <td>
+                                <b>Ending Balance</b>
+                            </td>
+                            <td colspan="3"/>
+                            <td class="text-right">
+                                <b>
+                                    <span t-esc="content_dict['total_balance_amount']"
+                                          t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                                </b>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4" class="text-right"/>
+                            <td class="text-right">
+                                <span t-esc="content_dict['total_amount_signed']"
+                                      t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                            </td>
+                            <td class="text-right">
+                                <span t-esc="content_dict['total_credit_amount']"
+                                      t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                            </td>
+                            <td class="text-right">
+                                <span t-esc="content_dict['total_balance_amount']"
+                                      t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="col-xs-4 pull-right">
+                    <table class="table table-condensed">
+                        <tr class="border-black">
+                            <td>
+                                <strong>Total Amount OverDue :</strong>
+                            </td>
+                            <td class="text-right">
+                                <strong>
+                                    <span t-field="partner.supplier_amount_overdue_payment"
+                                          t-options='{"widget": "monetary", "display_currency": partner.env.company.currency_id}'/>
+                                </strong>
+                            </td>
+                        </tr>
+                        <tr class="border-black">
+                            <td>
+                                <strong>Balance Due :</strong>
+                            </td>
+                            <td class="text-right">
+                                <strong>
+                                    <span t-field="partner.supplier_amount_due_payment"
+                                          t-options='{"widget": "monetary", "display_currency": partner.env.company.currency_id}'/>
+                                </strong>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <br/>
+            </div>
+        </template>
+
+        <template id="supplier_filter_statement_template">
+            <t t-set="company" t-value="partner.env.company"/>
+            <t t-set="partner" t-value="partner.with_context({'lang':partner.lang})"/>
+            <div class="text-right" style="margin-right: 15em;">
+                <p>
+                    <section>
+                        <span t-if='partner.name' t-esc="partner.name"/>&amp;nbsp;
+                        <span t-if='partner.street' t-esc="partner.street"/>&amp;nbsp;
+                        <span t-if='partner.street2' t-esc="partner.street2"/>&amp;nbsp;
+                        <br/>
+                    </section>
+                    <section>
+                        <span t-if='partner.street' t-esc="partner.street"/>&amp;nbsp;
+                        <span t-if='partner.street2' t-esc="partner.street2"/>&amp;nbsp;
+                        <br/>
+                    </section>
+                    <section>
+                        <span t-if='partner.city' t-esc="partner.city"/>&amp;nbsp;
+                        <span t-if='partner.state_id.name' t-esc="partner.state_id.name"/>&amp;nbsp;
+                        <span t-if='partner.zip' t-esc="partner.zip"/>&amp;nbsp;
+                        <span t-if='partner.country_id.name' t-esc="partner.country_id.name"/>
+                        <br/>
+                    </section>
+                    <section>
+                        <span t-if='partner.country_id.name' t-esc="partner.country_id.name"/>
+                        <br/>
+                    </section>
+                </p>
+
+                <br/>
+            </div>
+            <div class="page">
+                <div class="container mt16 mb16" style="margin-left:5px;">
+                    <t t-if="partner.supplier_statement_date_from">
+                        <strong>
+                            <span>From :</span>
+                        </strong>
+                        <span t-esc="partner.supplier_statement_date_from"/>
+                    </t>
+                    <t t-if="partner.supplier_statement_date_to">
+                        <strong style="margin-left:10px;">
+                            <span>To :</span>
+                        </strong>
+                        <span t-esc="partner.supplier_statement_date_to"/>
+                    </t>
+                </div>
+                <br/>
+                <br/>
+                <table class="table table-condensed">
+                    <thead>
+                        <tr class="text-center">
+                            <th colspan="2">Date</th>
+                            <th>Name</th>
+                            <th>Reference</th>
+                            <th>Invoices/Debit</th>
+                            <th>Payments/Credit</th>
+                            <th>Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+
+                            <td colspan="2"/>
+                            <td>
+                                <b>Initial Balance</b>
+                            </td>
+                            <td colspan="3"/>
+                            <td class="text-right">
+                                <b>
+                                    <span t-esc="partner.supplier_initial_balance"
+                                          t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                                </b>
+                            </td>
+                        </tr>
+                        <t t-set="balance" t-value="0.0"/>
+                        <t t-set="all_total" t-value="0.0"/>
+                        <t t-set="balance_sub_total" t-value="0.0"/>
+                        <tr t-foreach="content_dict['field_datas']" t-as="data">
+                            <t t-set="balance" t-value="balance + balance_sub_total "/>
+                            <td colspan="2">
+                                <span t-field="data.invoice_date"
+                                      t-options='{"widget": "date", "format": "MM-dd-yyyy"}'/>
+
+                            </td>
+                            <td>
+                                <span t-esc="data.reference"/>
+                            </td>
+                            <td>
+                                <span t-esc="data.partner_id.ref"/>
+                            </td>
+                            <td class="text-right">
+                                <span t-esc="data.amount_total_signed"
+                                      t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                            </td>
+                            <td class="text-right">
+                                <span t-esc="data.credit_payment"
+                                      t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                            </td>
+                            <td class="text-right">
+                                <t t-set="balance_sub_total" t-value="data.amount_total_signed-data.credit_payment"/>
+                                <t t-set="all_total" t-value="balance_sub_total + balance"/>
+                                <span t-esc="balance_sub_total + balance"
+                                      t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2"/>
+                            <td>
+                                <b>Ending Balance</b>
+                            </td>
+                            <td colspan="3"/>
+                            <td class="text-right">
+                                <b>
+                                    <span t-esc="all_total"
+                                          t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                                </b>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-right"/>
+                            <td/>
+                            <td/>
+                            <td/>
+                            <td class="text-right">
+                                <span t-esc="content_dict['total_amount_signed']"
+                                      t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                            </td>
+                            <td class="text-right">
+                                <span t-esc="content_dict['total_credit_amount']"
+                                      t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                            </td>
+                            <td class="text-right">
+                                <span t-esc="content_dict['total_balance_amount'] + partner.supplier_initial_balance"
+                                      t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="col-xs-4 pull-right">
+                    <table class="table table-condensed">
+                        <tr class="border-black">
+                            <td>
+                                <strong>Total Amount OverDue :</strong>
+                            </td>
+                            <td class="text-right">
+                                <strong>
+                                    <span t-esc="content_dict['total_balance_amount']"
+                                          t-options='{"widget": "monetary", "display_currency": partner.env.company.currency_id}'/>
+                                </strong>
+                            </td>
+                        </tr>
+                        <tr class="border-black">
+                            <td>
+                                <strong>Balance Due :</strong>
+                            </td>
+                            <td class="text-right">
+                                <strong>
+                                    <span t-esc="partner.supplier_amount_due_payment"
+                                          t-options='{"widget": "monetary", "display_currency": partner.env.company.currency_id}'/>
+                                </strong>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <br/>
+            </div>
+        </template>
+
+        <template id="buyer_monthly_statement_template">
+            <t t-set="company" t-value="partner.env.company"/>
+            <t t-set="partner" t-value="partner.with_context({'lang':partner.lang})"/>
+            <div class="col-xs-4">
+                <div class="pull-right">
+                    <div class="pull-left">
+                        <p>
+                            <section>
+                                <span t-if='partner.name' t-esc="partner.name"/>&amp;nbsp;
+                                <br/>
+                            </section>
+                            <section>
+                                <span t-if='partner.street' t-esc="partner.street"/>&amp;nbsp;
+                                <span t-if='partner.street2' t-esc="partner.street2"/>&amp;nbsp;
+                                <br/>
+                            </section>
+                            <section>
+                                <span t-if='partner.city' t-esc="partner.city"/>&amp;nbsp;
+                                <span t-if='partner.state_id.name' t-esc="partner.state_id.name"/>&amp;nbsp;
+                                <span t-if='partner.zip' t-esc="partner.zip"/>&amp;nbsp;
+                                <br/>
+                            </section>
+                            <section>
+                                <span t-if='partner.country_id.name' t-esc="partner.country_id.name"/>
+                                <br/>
+                            </section>
+                        </p>
+                    </div>
+                </div>
+                <br/>
+            </div>
+            <div class="page">
+                <div class="container" style="margin:5px 0 0 1px;">
+                    <div class="row">
+                        <h2>
+                            <span t-esc="partner.name"/>'s Monthly Customer Statement:
+                        </h2>
+                    </div>
+                </div>
+                <table class="table table-condensed">
+                    <thead>
+                        <tr class="text-center">
+                            <th>Date</th>
+                            <th>Invoice Number</th>
+                            <th>Ref</th>
+                            <th>Invoices/Credit</th>
+                            <th>Payments/Debit</th>
+                            <th>Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="content_dict['field_datas']" t-as="data">
+                            <td>
+                                <span t-field="data.m_invoice_date"
+                                      t-options='{"widget": "date", "format": "MM-dd-yyyy"}'/>
+                            </td>
+                            <td>
+                                <span t-esc="data.m_reference"/>
+                            </td>
+
+                            <td>
+                                <span t-esc="data.m_partner_id.ref"/>
+                            </td>
+                            <td class="text-right">
+                                <span t-esc="data.m_amount_total_signed"
+                                      t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                            </td>
+                            <td class="text-right">
+                                <span t-esc="data.m_credit_payment"
+                                      t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                            </td>
+                            <td class="text-right">
+                                <span t-esc="data.m_balance_due_amount"
+                                      t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="col-xs-4">
+                    <div t-if="partner.disable_global_notes" class="pull-left">
+                        <table t-attf-class="table table-sm" name="internal_table">
+                            <tbody>
+                                <tr t-if="partner.nck_internal_notes">
+                                    <td colspan="6">
+                                        <pre t-esc="partner.nck_internal_notes"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div t-else="" class="pull-left">
+                        <table t-attf-class="table table-sm" name="internal_table">
+                            <tbody>
+                                <tr t-if="partner.env.company.global_note">
+                                    <td colspan="6">
+                                        <pre t-esc="partner.env.company.global_note"/>
+                                    </td>
+                                </tr>
+                                <tr t-if="partner.nck_internal_notes">
+                                    <td colspan="6">
+                                        <pre t-esc="partner.nck_internal_notes"/>
+                                    </td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pull-right">
+                        <div class="col-xs-4">
+                            <div class="pull-left" style="margin-right: 30px;margin-bottom: 40px;">
+                                <div>
+                                    <img t-if="partner.qr_code"
+                                         t-att-src="image_data_uri(partner.qr_code)"
+                                         style="width: 60px; height: auto;"/>
+                                </div>
+                                <br/>
+                                <div style="margin-top: -20px;">
+                                    <em>
+                                        <a t-attf-href="/report/statements/#{slug(partner)}">Pay Now</a>
+                                    </em>
+                                </div>
+                            </div>
+                            <div class="pull-right">
+                                <table class="table table-condensed">
+                                    <tr class="border-black">
+                                        <td>
+                                            <strong>Total Amount OverDue :</strong>
+                                        </td>
+                                        <td class="text-right">
+                                            <strong>
+                                                <span t-field="partner.buyer_amount_overdue_payment_monthly"
+                                                      t-options='{"widget": "monetary", "display_currency": partner.env.company.currency_id}'/>
+                                            </strong>
+                                        </td>
+                                    </tr>
+                                    <tr class="border-black">
+                                        <td>
+                                            <strong>Balance Due :</strong>
+                                        </td>
+                                        <td class="text-right">
+                                            <strong>
+                                                <span t-field="partner.buyer_amount_due_payment_monthly"
+                                                      t-options='{"widget": "monetary", "display_currency": partner.env.company.currency_id}'/>
+                                            </strong>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br/>
+            </div>
+        </template>
+
+        <template id="buyer_weekly_statement_template">
+            <t t-set="company" t-value="partner.env.company"/>
+            <t t-set="partner" t-value="partner.with_context({'lang':partner.lang})"/>
+            <div class="col-xs-4">
+                <div class="pull-right">
+                    <div class="pull-left">
+                        <p>
+                            <section>
+                                <span t-if='partner.name' t-esc="partner.name"/>&amp;nbsp;
+                                <br/>
+                            </section>
+                            <section>
+                                <span t-if='partner.street' t-esc="partner.street"/>&amp;nbsp;
+                                <span t-if='partner.street2' t-esc="partner.street2"/>&amp;nbsp;
+                                <br/>
+                            </section>
+                            <section>
+                                <span t-if='partner.city' t-esc="partner.city"/>&amp;nbsp;
+                                <span t-if='partner.state_id.name' t-esc="partner.state_id.name"/>&amp;nbsp;
+                                <span t-if='partner.zip' t-esc="partner.zip"/>&amp;nbsp;
+                                <br/>
+                            </section>
+                            <section>
+                                <span t-if='partner.country_id.name' t-esc="partner.country_id.name"/>
+                                <br/>
+                            </section>
+                        </p>
+                    </div>
+                </div>
+                <br/>
+            </div>
+            <div class="page">
+                <div class="container" style="margin:5px 0 0 1px;">
+                    <div class="row">
+                        <h2>
+                            <span t-esc="partner.name"/>'s Weekly Customer Statement:
+                        </h2>
+                    </div>
+                </div>
+                <table class="table table-condensed">
+                    <thead>
+                        <tr class="text-center">
+                            <th>Date</th>
+                            <th>Invoice Number</th>
+                            <th>Ref</th>
+                            <th>Invoices/Credit</th>
+                            <th>Payments/Debit</th>
+                            <th>Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-set="balance" t-value="0.0"/>
+                        <t t-set="all_total" t-value="0.0"/>
+                        <tr t-foreach="content_dict['field_datas']" t-as="data">
+                            <td>
+                                <span t-esc="data.w_invoice_date"/>
+
+                            </td>
+                            <td>
+                                <span t-esc="data.w_reference"/>
+                            </td>
+
+                            <td>
+                                <span t-esc="data.w_partner_id.ref"/>
+                            </td>
+                            <td class="text-right">
+                                <span t-esc="data.w_amount_total_signed"
+                                      t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                            </td>
+                            <td class="text-right">
+                                <span t-esc="data.w_credit_payment"
+                                      t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                            </td>
+                            <td class="text-right">
+                                <span t-esc="data.w_balance_due_amount"
+                                      t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+
+                <div class="col-xs-4">
+                    <div t-if="partner.disable_global_notes" class="pull-left">
+                        <table t-attf-class="table table-sm" name="internal_table">
+                            <tbody>
+                                <tr t-if="partner.nck_internal_notes">
+                                    <td colspan="6">
+                                        <pre t-esc="partner.nck_internal_notes"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div t-else="" class="pull-left">
+                        <table t-attf-class="table table-sm" name="internal_table">
+                            <tbody>
+                                <tr t-if="partner.env.company.global_note">
+                                    <td colspan="6">
+                                        <pre t-esc="partner.env.company.global_note"/>
+                                    </td>
+                                </tr>
+                                <tr t-if="partner.nck_internal_notes">
+                                    <td colspan="6">
+                                        <pre t-esc="partner.nck_internal_notes"/>
+                                    </td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="pull-right">
+                        <div class="col-xs-4">
+                            <div class="pull-left" style="margin-right: 30px;margin-bottom: 40px;">
+                                <div>
+                                    <img t-if="partner.qr_code"
+                                         t-att-src="image_data_uri(partner.qr_code)"
+                                         style="width: 60px; height: auto;"/>
+                                </div>
+                                <br/>
+                                <div style="margin-top: -20px;">
+                                    <em>
+                                        <a t-attf-href="/report/statements/#{slug(partner)}">Pay Now</a>
+                                    </em>
+                                </div>
+                            </div>
+                            <div class="pull-right">
+                                <table class="table table-condensed">
+                                    <tr class="border-black">
+                                        <td>
+                                            <strong>Total Amount OverDue :</strong>
+                                        </td>
+                                        <td class="text-right">
+                                            <strong>
+                                                <span t-field="partner.buyer_amount_overdue_payment_weekly"
+                                                      t-options='{"widget": "monetary", "display_currency": partner.env.company.currency_id}'/>
+                                            </strong>
+                                        </td>
+                                    </tr>
+                                    <tr class="border-black">
+                                        <td>
+                                            <strong>Balance Due :</strong>
+                                        </td>
+                                        <td class="text-right">
+                                            <strong>
+                                                <span t-field="partner.buyer_amount_due_payment_weekly"
+                                                      t-options='{"widget": "monetary", "display_currency": partner.env.company.currency_id}'/>
+                                            </strong>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <template id="custom_buyer_statement_template">
+            <t t-set="company" t-value="partner.env.company"/>
+            <t t-set="partner" t-value="partner.with_context({'lang':partner.lang})"/>
+            <div class="col-xs-4">
+                <div class="pull-right">
+                    <div class="pull-left">
+                        <p>
+                            <section>
+                                <span t-if='partner.name' t-esc="partner.name"/>&amp;nbsp;
+                                <br/>
+                            </section>
+                            <section>
+                                <span t-if='partner.street' t-esc="partner.street"/>&amp;nbsp;
+                                <span t-if='partner.street2' t-esc="partner.street2"/>&amp;nbsp;
+                                <br/>
+                            </section>
+                            <section>
+                                <span t-if='partner.city' t-esc="partner.city"/>&amp;nbsp;
+                                <span t-if='partner.state_id.name' t-esc="partner.state_id.name"/>&amp;nbsp;
+                                <span t-if='partner.zip' t-esc="partner.zip"/>&amp;nbsp;
+                                <br/>
+                            </section>
+                            <section>
+                                <span t-if='partner.country_id.name' t-esc="partner.country_id.name"/>
+                                <br/>
+                            </section>
+                        </p>
+                    </div>
+                </div>
+                <br/>
+            </div>
+            <div class="page">
+                <div class="container" style="margin:5px 0 0 1px;">
+                    <div class="row">
+                        <h2>
+                            <span t-esc="partner.name"/>'s Customer Statement:
+                        </h2>
+                    </div>
+                </div>
+                <div class="container" style="margin:5px 0 0 1px;">
+                    <strong>
+                        <span>Date :</span>
+                    </strong>
+                    <span t-esc="datetime.datetime.now().strftime('%m/%d/%Y')"/>
+                </div>
+                <br/>
+                <br/>
+                <table class="table table-condensed">
+                    <thead>
+                        <tr class="text-center">
+                            <th colspan="2">Date</th>
+                            <th>Invoice Number</th>
+                            <th>Reference</th>
+                            <th>Invoices/Debit</th>
+                            <th>Payments/Credit</th>
+                            <th>Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-set="balance" t-value="0.0"/>
+                        <t t-set="all_total" t-value="0.0"/>
+                        <tr>
+                            <td/>
+                            <td>
+                                <b>Initial Balance</b>
+                            </td>
+                            <td colspan="4"/>
+                            <td class="text-right">
+                                <b>
+                                    <span t-esc="0.0"
+                                          t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                                </b>
+                            </td>
+                        </tr>
+                        <t t-set="grand_total" t-value="0.0"/>
+                        <t t-set="bal" t-value="0.0"/>
+                        <t t-set="sub_total" t-value="0.0"/>
+                        <tr t-foreach="content_dict['field_datas']" t-as="data">
+                            <td colspan="2">
+                                <span t-field="data.c_invoice_date"
+                                      t-options='{"widget": "date", "format": "MM-dd-yyyy"}'/>
+                            </td>
+                            <td>
+                                <span t-esc="data.c_reference"/>
+                            </td>
+                            <td>
+                                <span t-esc="data.c_partner_id.ref"/>
+                            </td>
+                            <td class="text-right">
+                                <span t-esc="data.c_amount_total_signed"
+                                      t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                            </td>
+                            <td class="text-right">
+                                <span t-esc="data.c_credit_payment"
+                                      t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                            </td>
+                            <td class="text-right">
+                                <span t-esc="data.c_balance_due_amount"
+                                      t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td/>
+                            <td>
+                                <b>Ending Balance</b>
+                            </td>
+                            <td colspan="4"/>
+                            <td class="text-right">
+                                <b>
+                                    <span t-esc="content_dict['total_balance_amount']"
+                                          t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                                </b>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-right"/>
+                            <td/>
+                            <td/>
+                            <td/>
+                            <td class="text-right">
+                                <span t-esc="content_dict['total_amount_signed']"
+                                      t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                            </td>
+                            <td class="text-right">
+                                <span t-esc="content_dict['total_credit_amount']"
+                                      t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                            </td>
+                            <td class="text-right">
+                                <span t-esc="content_dict['total_balance_amount']"
+                                      t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                            </td>
+                        </tr>
+                    </tbody>
+
+                </table>
+
+                <div class="col-xs-4">
+                    <div t-if="partner.disable_global_notes" class="pull-left">
+                        <table t-attf-class="table table-sm" name="internal_table">
+                            <tbody>
+                                <tr t-if="partner.nck_internal_notes">
+                                    <td colspan="6">
+                                        <pre t-esc="partner.nck_internal_notes"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div t-else="" class="pull-left">
+                        <table t-attf-class="table table-sm" name="internal_table">
+                            <tbody>
+                                <tr t-if="partner.env.company.global_note">
+                                    <td colspan="6">
+                                        <pre t-esc="partner.env.company.global_note"/>
+                                    </td>
+                                </tr>
+                                <tr t-if="partner.nck_internal_notes">
+                                    <td colspan="6">
+                                        <pre t-esc="partner.nck_internal_notes"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pull-right">
+                        <div class="col-xs-4">
+                            <div class="pull-left" style="margin-right: 30px;margin-bottom: 40px;">
+                                <div>
+                                    <img t-if="partner.qr_code"
+                                         t-att-src="image_data_uri(partner.qr_code)"
+                                         style="width: 60px; height: auto;"/>
+                                </div>
+                                <br/>
+                                <div style="margin-top: -20px;">
+                                    <em>
+                                        <a t-attf-href="/report/statements/#{slug(partner)}">Pay Now</a>
+                                    </em>
+                                </div>
+                            </div>
+                            <div class="pull-right">
+                                <table class="table table-condensed">
+                                    <tr class="border-black">
+                                        <td>
+                                            <strong>Total Amount OverDue :</strong>
+                                        </td>
+                                        <td class="text-right">
+                                            <strong>
+                                                <span t-field="partner.buyer_amount_overdue_payment"
+                                                      t-options='{"widget": "monetary", "display_currency": partner.env.company.currency_id}'/>
+                                            </strong>
+                                        </td>
+                                    </tr>
+                                    <tr class="border-black">
+                                        <td>
+                                            <strong>Balance Due :</strong>
+                                        </td>
+                                        <td class="text-right">
+                                            <strong>
+                                                <span t-field="partner.buyer_amount_due_payment"
+                                                      t-options='{"widget": "monetary", "display_currency": partner.env.company.currency_id}'/>
+                                            </strong>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br/>
+                <table t-attf-class="table table-sm" name="days_table">
+                    <thead>
+                        <tr>
+                            <th/>
+                            <th>0-30</th>
+                            <th>30-60</th>
+                            <th>60-90</th>
+                            <th>90+</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tr>
+                        <td/>
+                        <td>
+                            <span t-field="partner.custom_aged_analysis_f_thirty"
+                                  t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                        </td>
+                        <td>
+                            <span t-field="partner.custom_aged_analysis_t_sixty"
+                                  t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                        </td>
+                        <td>
+                            <span t-field="partner.custom_aged_analysis_s_ninety"
+                                  t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                        </td>
+                        <td>
+                            <span t-field="partner.custom_aged_analysis_ninety_plus"
+                                  t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                        </td>
+                        <td>
+                            <span t-field="partner.custom_aged_analysis_total"
+                                  t-options="{'widget': 'monetary', 'display_currency': partner.env.company.currency_id}"/>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </template>
+
+        <template id="outstanding_report_template">
+            <t t-set="company" t-value="env.company"/>
+            <div class="page">
+                <div>
+                    <br/>
+                    <br/>
+                </div>
+                <table class="table table-condensed">
+                    <thead>
+                        <tr>
+                            <th>
+                                <span t-esc="data['form']['journal_name']"/>
+                            </th>
+                            <th>
+                                <span>Invoice Date</span>
+                            </th>
+                            <t t-foreach="data['form']['due_month_list']" t-as="month">
+                                <th>
+                                    <span t-esc="month"/>
+                                </th>
+                            </t>
+                            <th>
+                                <span>Total</span>
+                            </th>
+                            <th>
+                                <span>Due Date</span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <t t-foreach="data['form']['dict_all_data']" t-as="data_vals">
+                        <t t-foreach="data_vals_value" t-as="inner_data_vals">
+                            <tr>
+                                <td>
+                                    <strong>
+                                        <span t-esc="get_customer(inner_data_vals)"/>
+                                    </strong>
+                                </td>
+                                <td/>
+                                <t t-foreach="data['form']['due_month_list']" t-as="month">
+                                    <td/>
+                                </t>
+                                <td colspan="2"/>
+                            </tr>
+                            <t t-foreach="inner_data_vals_value" t-as="sub_inner_data_vals">
+                                <tr>
+                                    <td>
+                                        <span t-esc="sub_inner_data_vals['invoice_number']"/>
+                                    </td>
+                                    <td>
+                                        <span t-esc="sub_inner_data_vals['invoice_date']"/>
+                                    </td>
+                                    <t t-foreach="data['form']['due_month_list']" t-as="month">
+                                        <t t-if="sub_inner_data_vals.get(month)">
+                                            <td>
+                                                <span t-esc="sub_inner_data_vals.get(month)"/>
+                                            </td>
+                                        </t>
+                                        <t t-if=" not sub_inner_data_vals.get(month)">
+                                            <td/>
+                                        </t>
+                                    </t>
+                                    <td>
+                                        <span t-esc="sub_inner_data_vals['total']"/>
+                                    </td>
+                                    <td>
+                                        <span t-esc="sub_inner_data_vals['invoice_date_due']"/>
+                                    </td>
+                                </tr>
+                            </t>
+                        </t>
+                        <tr>
+                            <td/>
+                            <td/>
+                            <t t-foreach="data['form']['list_months_total_dict']" t-as="month_total">
+                                <t t-foreach="month_total" t-as="inner_month_total">
+                                    <t t-if="inner_month_total == data_vals">
+                                        <t t-foreach="data['form']['due_month_list']" t-as="month">
+                                            <td>
+                                                <strong>
+                                                    <span t-esc="inner_month_total_value[month]"/>
+                                                </strong>
+                                            </td>
+                                        </t>
+                                    </t>
+                                </t>
+                            </t>
+                            <td/>
+                            <td/>
+                        </tr>
+                    </t>
+                </table>
+            </div>
+        </template>
+
+    </data>
+</odoo>

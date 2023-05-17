@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <record id="wizard_form_custom_statement_conf" model="ir.ui.view">
+            <field name="name">buyer.custom.statement.wizard.form</field>
+            <field name="model">buyer.custom.statement.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Send Customer Statement">
+                    <group string="Duration">
+                        <field name="custom_duration" />
+                    </group>
+                    <group colspan="2" col="4" attrs="{'invisible':[('custom_duration','!=','custom')],'required':[('custom_duration','=','custom')]}">
+                        <field name="custom_date_from" />
+                        <field name="custom_date_to" />
+                    </group>
+                    <footer>
+                        <button name="custom_statement_buyer_statements" string="Send Customer's Statement" type="object" class="btn btn-primary" />
+                    </footer>
+                </form>
+            </field>
+        </record>
+        <record id="action_buyer_custom_wizard" model="ir.actions.act_window">
+            <field name="name">Customer Custom Statements</field>
+            <field name="res_model">buyer.custom.statement.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="wizard_form_custom_statement_conf" />
+            <field name="binding_model_id" eval="False" />
+            <field name="target">new</field>
+        </record>
+        <record model="ir.actions.server" id="action_update_invoice_date">
+            <field name="name">Customer Custom Statements</field>
+            <field name="model_id" ref="base.model_res_partner" />
+            <field name="binding_model_id" ref="base.model_res_partner" />
+            <field name="state">code</field>
+            <field name="code">
+                action = records.action_show_custom_wizard()
+            </field>
+        </record>
+    </data>
+</odoo>

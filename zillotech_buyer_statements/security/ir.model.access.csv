@@ -1,0 +1,15 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_filter_data_line,filter_data_line,model_filter_data_line,account.group_account_invoice,1,1,1,1
+access_filter_data_line,filter_data_line,model_filter_data_line,base.group_user,1,1,1,1
+access_filter_supplier_data_line,filter_supplier_data_line,model_filter_supplier_data_line,account.group_account_invoice,1,1,1,1
+access_filter_supplier_data_line,filter_supplier_data_line,model_filter_supplier_data_line,base.group_user,1,1,1,1
+access_buyer_monthly_statement,buyer_monthly_statement,model_buyer_monthly_statement,account.group_account_invoice,1,1,1,1
+access_buyer_monthly_statement,buyer_monthly_statement,model_buyer_monthly_statement,base.group_user,1,1,1,1
+access_buyer_weekly_statement,buyer_weekly_statement,model_buyer_weekly_statement,account.group_account_invoice,1,1,1,1
+access_buyer_weekly_statement,buyer_weekly_statement,model_buyer_weekly_statement,base.group_user,1,1,1,1
+access_buyer_custom_statement,buyer_custom_statement,model_buyer_custom_statement,account.group_account_invoice,1,1,1,1
+access_buyer_custom_statement,buyer_custom_statement,model_buyer_custom_statement,base.group_user,1,1,1,1
+access_buyer_custom_statement_wizard,buyer_custom_statement_wizard,model_buyer_custom_statement_wizard,,1,1,1,1
+access_buyer_outstanding_report_wizard,access.buyer.outstanding.report.wizard,model_buyer_outstanding_report_wizard,base.group_user,1,1,1,1
+access_buyer_outstanding_report_wizard,access.buyer.outstanding.report.wizard,model_buyer_outstanding_report_wizard,,1,1,1,1
+access_partner_email_wizard,access.partner.email.wizard,model_partner_email_wizard,,1,1,1,1

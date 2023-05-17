@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record model="ir.ui.view" id="res_config_settings_view_form_buyer_statements">
+            <field name="name">res.config.settings.view.form.buyer.statements</field>
+            <field name="model">res.config.settings</field>
+            <field name="inherit_id" ref="account.res_config_settings_view_form" />
+            <field name="arch" type="xml">
+                <xpath expr="//div[@id='analytic']" position="after">
+                    <h2>Customer Statement Configuration Section</h2>
+                    <div class="row mt16 o_settings_container" id="buyer_statements">
+                        <div class="col-12 col-lg-6 o_setting_box">
+                            <div class="o_setting_left_pane">
+                                <field name="customer_statement_bool" />
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="customer_statement_bool" />
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-6 o_setting_box">
+                            <div class="o_setting_left_pane">
+                                <field name="send_overdue_statement" />
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="send_overdue_statement" />
+                                <div class="content-group" attrs="{'invisible':[('send_overdue_statement','!=',True)]}">
+                                    <div class="row mt16 " style="margin-left:11px;    min-width: 130%;">
+                                        <label for="int_overdue_day_num" />
+                                        <field style="margin-left:22%;" name="int_overdue_day_num" class="col-lg-3" attrs="{'required':[('send_overdue_statement','!=',False)]}" />
+                                        <div class="text-muted" style="margin-left:11px;">select between 1 to 30</div>
+                                    </div>
+                                    <div class="row mt16 " style="margin-left:11px;">
+                                        <label for="overdue_email_template_id" />
+                                        <field class=" col-lg-4" name="overdue_email_template_id" domain="[('model_id.model','=','res.partner')]" attrs="{'required':[('send_overdue_statement','!=',False)]}" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12  o_setting_box">
+                            <div class="o_setting_left_pane">
+                                <field name="auto_statement_weekly" attrs="{'invisible':[('customer_statement_bool','!=',True)]}" />
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="auto_statement_weekly" attrs="{'invisible':[('customer_statement_bool','!=',True)]}" />
+                                <div class="content-group" attrs="{'invisible':['|',('customer_statement_bool','!=',True),('auto_statement_weekly','!=',True)]}">
+                                    <div class="row mt16 col-lg-12">
+                                        <label for="weekly_statement_selected" class="col-lg-3" />
+                                        <field style="margin-left:15px;" name="weekly_statement_selected" attrs="{'required':[('auto_statement_weekly','!=',False)]}" class="col-lg-2" />
+                                    </div>
+                                    <div class="row mt16 col-lg-12">
+                                        <label for="weekly_template_report_id" class="col-lg-3" />
+                                        <field name="weekly_template_report_id" class="col-lg-3" domain="[('model_id.model','=','res.partner')]" attrs="{'required':[('auto_statement_weekly','!=',False)]}" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12  o_setting_box">
+                            <div class="o_setting_left_pane">
+                                <field name="auto_statement_monthly" attrs="{'invisible':[('customer_statement_bool','!=',True)]}" />
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="auto_statement_monthly" attrs="{'invisible':[('customer_statement_bool','!=',True)]}" />
+                                <div class="content-group" attrs="{'invisible':['|',('customer_statement_bool','!=',True),('auto_statement_monthly','!=',True)]}">
+                                    <div class="row mt16 col-lg-12">
+                                        <label for="int_monthly_statement_num" class="col-lg-3" />
+                                        <field style="margin-left:15px;" name="int_monthly_statement_num" class="col-lg-2" attrs="{'required':[('auto_statement_monthly','!=',False)]}" />
+                                        <div style="margin-left:10px;" class="text-muted">select between 1 to 30</div>
+                                    </div>
+                                    <div class="row mt16 col-lg-12">
+                                        <label for="monthly_template_report_id" class="col-lg-3" />
+                                        <field name="monthly_template_report_id" class="col-lg-3" domain="[('model_id.model','=','res.partner')]" attrs="{'required':[('auto_statement_monthly','!=',False)]}" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt16 o_settings_container" id="buyer_statements_global_notes">
+                        <div class="col-12 col-lg-6 o_setting_box">
+                            <div class="o_setting_left_pane">
+                                <field name="global_note_bool" />
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="global_note_bool" />
+                            </div>
+                        </div>
+                        <div class="col-12  o_setting_box" attrs="{'invisible':[('global_note_bool','!=',True)]}">
+                            <div class="o_setting_left_pane">
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <field name="global_note" />
+                            </div>
+                        </div>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

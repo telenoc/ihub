@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="partner_email_wizard_wizard_form" model="ir.ui.view">
+            <field name="name">partner.email.wizard.form</field>
+            <field name="model">partner.email.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Email Wizard">
+                    <group>
+                        <group>
+                            <field name="customer_id" />
+                            <field name="email" />
+                            <field name="customer_bool" invisible="1" />
+                            <field name="overdue_bool" invisible="1" />
+                            <field name="filter_bool" invisible="1" />
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="action_sent_buyer_mail_from_wizard" string="Sent Statement" type="object" class="oe_highlight" attrs="{'invisible': [('customer_bool','==', False)]}" />
+                        <button name="action_sent_buyer_overdue_mail_from_wizard" string="Sent Overdue Statement" type="object" class="oe_highlight" attrs="{'invisible': [('overdue_bool','==', False)]}" />
+                        <button name="action_sent_filtered_buyer_statement_from_wizard" string="Sent Filtered Statement" type="object" class="oe_highlight" attrs="{'invisible': [('filter_bool','==', False)]}" />
+                        <button string="Cancel" class="oe_link" special="cancel" />
+                    </footer>
+                </form>
+            </field>
+        </record>
+        <record id="partner_email_wizard_form_action" model="ir.actions.act_window">
+            <field name="name">Sent Email Wizard</field>
+            <field name="res_model">partner.email.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="binding_view_types">form,list</field>
+        </record>
+    </data>
+</odoo>
