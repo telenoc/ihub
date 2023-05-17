@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <record id="wizard_buyer_statement_outstanding_report_view" model="ir.ui.view">
+            <field name="name">Create Outstanding Report</field>
+            <field name="model">buyer.outstanding.report.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Create Outstanding Report">
+                    <group attrs="{'invisible':[('excel_file_bool','!=',False)]}">
+                        <field name="journal_id" />
+                        <field name="first_date" />
+                        <field name="last_date" />
+                    </group>
+                    <group attrs="{'invisible':[('excel_file_bool','=',False)]}">
+                        <field name="file_name" invisible="1" />
+                        <field name="excel_file_bool" invisible="1" />
+                        <field name="excel_file" readonly="1" filename="file_name" />
+                    </group>
+                    <footer>
+                        <button string="Print Excel" type="object" name="action_outstanding_report_print_excel_pdf" class="btn btn-link" style="color:black;background-color:#8AC7DB;" />
+                        <button string="Print PDF" type="object" name="action_outstanding_report_print_excel_pdf" class="btn btn-link" style="color:black;background-color:#8AC7DB;" context="{'type':'pdf'}" />
+                        <button string="Cancel" special="cancel" />
+                    </footer>
+                </form>
+            </field>
+        </record>
+        <record id="action_buyer_outstanding_report_wizard" model="ir.actions.act_window">
+            <field name="name">Outstanding Report</field>
+            <field name="res_model">buyer.outstanding.report.wizard</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="wizard_buyer_statement_outstanding_report_view" />
+            <field name="target">new</field>
+        </record>
+        <menuitem id="menu_outstanding_invoice_report" name="Outstanding Invoice Report" action="action_buyer_outstanding_report_wizard" parent="account.account_reports_management_menu" sequence="10" />
+    </data>
+</odoo>

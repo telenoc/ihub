@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <template id="report_buyer_statements">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <t t-call="zillotech_buyer_statements.buyer_statement_template" />
+                </t>
+            </t>
+        </template>
+        <template id="report_buyer_fil_statements">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <t t-call="zillotech_buyer_statements.buyer_filter_statement_template" />
+                </t>
+            </t>
+        </template>
+        <template id="report_buyer_o_statements">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <t t-call="zillotech_buyer_statements.buyer_overdue_statement_template" />
+                </t>
+            </t>
+        </template>
+        <template id="report_buyer_m_statements">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <t t-call="zillotech_buyer_statements.buyer_monthly_statement_template" />
+                </t>
+            </t>
+        </template>
+        <template id="report_buyer_w_statements">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <t t-call="zillotech_buyer_statements.buyer_weekly_statement_template" />
+                </t>
+            </t>
+        </template>
+        <template id="report_buyer_c_statements">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <t t-call="zillotech_buyer_statements.custom_buyer_statement_template" />
+                </t>
+            </t>
+        </template>
+        <template id="report_sup_fil_statements">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <t t-if="data['supplier_statement']">
+                        <t t-call="zillotech_buyer_statements.supplier_statement_template" />
+                    </t>
+                    <t t-if="data['filter_supplier_statement']">
+                        <t t-call="zillotech_buyer_statements.supplier_filter_statement_template" />
+                    </t>
+                </t>
+            </t>
+        </template>
+        <template id="report_print_pdf_o_report">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <t t-call="zillotech_buyer_statements.outstanding_report_template" />
+                </t>
+            </t>
+        </template>
+        <record id="action_report_buyer_statements" model="ir.actions.report">
+            <field name="name">Customer Statements</field>
+            <field name="model">res.partner</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">zillotech_buyer_statements.report_buyer_statements</field>
+            <field name="report_file">zillotech_buyer_statements.report_buyer_statements</field>
+            <field name="print_report_name">'Customer Statements' - %s' % object.name</field>
+            <field name="binding_model_id" eval="False" />
+            <field name="binding_type">report</field>
+        </record>
+        <record id="action_report_buyer_filtered_statements" model="ir.actions.report">
+            <field name="name">Customer Filtered Statements</field>
+            <field name="model">res.partner</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">zillotech_buyer_statements.report_buyer_fil_statements</field>
+            <field name="report_file">zillotech_buyer_statements.report_buyer_fil_statements</field>
+            <field name="print_report_name">'Customer Filtered Statements' - %s' % object.name</field>
+            <field name="binding_model_id" eval="False" />
+            <field name="binding_type">report</field>
+        </record>
+        <record id="action_report_buyer_overdue_statements" model="ir.actions.report">
+            <field name="name">Customer Filtered Statements</field>
+            <field name="model">res.partner</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">zillotech_buyer_statements.report_buyer_o_statements</field>
+            <field name="report_file">zillotech_buyer_statements.report_buyer_o_statements</field>
+            <field name="print_report_name">'Customer Overdue Statements' - %s' % object.name</field>
+            <field name="binding_model_id" eval="False" />
+            <field name="binding_type">report</field>
+        </record>
+        <record id="action_report_supplier_filtered_statements" model="ir.actions.report">
+            <field name="name">Supplier Filtered Statements</field>
+            <field name="model">res.partner</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">zillotech_buyer_statements.report_sup_fil_statements</field>
+            <field name="report_file">zillotech_buyer_statements.report_sup_fil_statements</field>
+            <field name="print_report_name">'Supplier Statements' - %s' % object.name</field>
+            <field name="binding_model_id" eval="False" />
+            <field name="binding_type">report</field>
+        </record>
+    </data>
+</odoo>

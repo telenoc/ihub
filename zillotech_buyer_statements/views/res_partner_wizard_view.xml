@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <record id="view_filter_buyer_statements" model="ir.ui.view">
+            <field name="name">res.partner.filter.form</field>
+            <field name="model">res.partner</field>
+            <field name="priority">1000</field>
+            <field name="arch" type="xml">
+                <form string="Filter Form">
+                    <div>
+                        <div class="oe_left">
+                            <label for="buyer_statement_date_from" />
+                            <field name="buyer_statement_date_from" />&amp;nbsp;&amp;nbsp;&amp;nbsp;
+                        </div>
+                        <div class="oe_left">
+                            <label for="buyer_statement_date_to" />
+                            <field name="buyer_statement_date_to" />
+                        </div>
+                    </div>&amp;nbsp;&amp;nbsp;&amp;nbsp;
+                    <button name="action_get_buyer_filtered_statements" type="object" class="btn btn-link" style="color:black;background-color:#8AC7DB;" string="Get Filtered Customer Statements" />
+                    <separator />
+                    <field name="buyer_filter_line_ids" />
+                    <group class="oe_subtotal_footer oe_right">
+                        <field name="buyer_amount_due_payment_filtered" />
+                        <br />
+                        <field name="buyer_amount_overdue_payment_filtered" />
+                    </group>
+                    <footer class="oe_edit_only">
+                        <button name="action_print_filtered_buyer_statement" type="object" class="btn btn-link" style="color:black;background-color:#8AC7DB;" string="Print Filtered Customer Statements" />
+                        <button name="action_sent_filtered_buyer_statement" type="object" class="btn btn-link" style="color:black;background-color:#8AC7DB;" string="Sent Filtered Customer Statements" />
+                        <button string="Discard" special="cancel" data-hotkey="z" />
+                    </footer>
+                </form>
+            </field>
+        </record>
+        <record id="view_filter_supplier_statements" model="ir.ui.view">
+            <field name="name">res.partner.supplier.filter.form</field>
+            <field name="model">res.partner</field>
+            <field name="priority">1000</field>
+            <field name="arch" type="xml">
+                <form string="Filter Supplier Form">
+                    <div>
+                        <div class="oe_left">
+                            <label for="supplier_statement_date_from" />
+                            <field name="supplier_statement_date_from" />&amp;nbsp;&amp;nbsp;&amp;nbsp;
+                        </div>
+                        <div class="oe_left">
+                            <label for="supplier_statement_date_to" />
+                            <field name="supplier_statement_date_to" />
+                        </div>
+                    </div>&amp;nbsp;&amp;nbsp;&amp;nbsp;
+                    <button name="action_get_supplier_filtered_statements" type="object" class="btn btn-link" style="color:black;background-color:#8AC7DB;" string="Get Filtered Supplier Statements" />
+                    <separator />
+                    <field name="supplier_filter_line_ids" />
+                    <group class="oe_subtotal_footer oe_right">
+                        <field name="supplier_amount_due_payment_filtered" />
+                        <br />
+                        <field name="supplier_amount_overdue_payment_filtered" />
+                    </group>
+                    <footer class="oe_edit_only">
+                        <button name="action_print_filtered_supplier_statement" type="object" class="btn btn-link" style="color:black;background-color:#8AC7DB;" string="Print Filtered Supplier Statements" />
+                        <button string="Discard" special="cancel" data-hotkey="z" />
+                    </footer>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>

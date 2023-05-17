@@ -1,0 +1,453 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data>
+        <template id="portal_my_statement_invoices" name="My Overdue Invoices">
+            <t t-call="portal.portal_layout">
+                <t t-set="breadcrumbs_searchbar" t-value="True" />
+                <t t-if="buyer_statement" t-call="portal.portal_searchbar">
+                    <t class="text-center">
+                        <strong>
+                            <t t-esc="partner.name" />'s Customer Invoices
+                        </strong>
+                    </t>
+                </t>
+                <t t-if="filtered_buyer_statement" t-call="portal.portal_searchbar">
+                    <t class="text-center">
+                        <strong>
+                            <t t-esc="partner.name" />'s Filtered Customer Invoices
+                        </strong>
+                    </t>
+                </t>
+                <t t-if="overdue_buyer_statement" t-call="portal.portal_searchbar">
+                    <t class="text-center">
+                        <strong>
+                            <t t-esc="partner.name" />'s Overdue Invoices
+                        </strong>
+                    </t>
+                </t>
+                <t t-if="weekly_buyer_statement" t-call="portal.portal_searchbar">
+                    <t class="text-center">
+                        <strong>
+                            <t t-esc="partner.name" />'s Weekly Overdue Invoices
+                        </strong>
+                    </t>
+                </t>
+                <t t-if="monthly_buyer_statement" t-call="portal.portal_searchbar">
+                    <t class="text-center">
+                        <strong>
+                            <t t-esc="partner.name" />'s Monthly Overdue Invoices
+                        </strong>
+                    </t>
+                </t>
+                <t t-if="custom_buyer_statement" t-call="portal.portal_searchbar">
+                    <t class="text-center">
+                        <strong>
+                            <t t-esc="partner.name" />'s Custom Overdue Invoices
+                        </strong>
+                    </t>
+                </t>
+                <t t-if="not content_dict['field_datas']">
+                    <br />
+                    <div class="row mr16">
+                        <div t-attf-class="'col-lg-12 mr16 ml16 alert alert-dismissable' #{'alert-danger' if error else 'alert-warning'}" role="alert" style="text-align: center;">
+                            <a href="#" class="close" data-dismiss="alert" aria-label="close" title="close">×</a>
+                            <t name="generic">
+                                There are currently no Overdue Invoices for your account.
+                            </t>
+                        </div>
+                    </div>
+                </t>
+                <t t-if="partner.inv_null">
+                    <div id="invoice_null" class="col-12 col-lg justify-content-end">
+                        <!-- <div t-if="order.state == 'cancel'" class="alert alert-danger alert-dismissable d-print-none"
+                             role="alert"> -->
+                        <div class="alert alert-danger alert-dismissable d-print-none" role="alert">
+                            <button type="button" class="close" data-dismiss="alert" aria-label="close">&amp;times;
+                            </button>
+                            <strong>No Invoices got selected!</strong>
+                        </div>
+                    </div>
+                </t>
+                <form id="portal_pay" t-if="content_dict['field_datas']" t-attf-action="/portal_pay?partner=#{partner.id}" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
+                    <button class="btn btn-primary" type="submit" role="button">
+                        <i class="fa fa-arrow-circle-right" />
+                        <span class='d-none d-md-inline'>Pay Multiple Invoices</span>
+                    </button>
+                    <br />
+                    <t t-call="portal.portal_table">
+                        <thead>
+                            <tr class="active">
+                                <th />
+                                <th>Invoice #</th>
+                                <th>Invoice Date</th>
+                                <th class='d-none d-md-table-cell'>Due Date</th>
+                                <th colspan="2" />
+                                <th class="text-right">Amount Due</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-if="buyer_statement">
+                                <t t-call="zillotech_buyer_statements.buyer_statement_web_template" />
+                            </t>
+                            <t t-if="filtered_buyer_statement">
+                                <t t-call="zillotech_buyer_statements.filtered_buyer_statement_web_template" />
+                            </t>
+                            <t t-if="weekly_buyer_statement">
+                                <t t-call="zillotech_buyer_statements.weekly_buyer_statement_web_template" />
+                            </t>
+                            <t t-if="monthly_buyer_statement">
+                                <t t-call="zillotech_buyer_statements.monthly_buyer_statement_web_template" />
+                            </t>
+                            <t t-if="custom_buyer_statement">
+                                <t t-call="zillotech_buyer_statements.custom_buyer_statement_web_template" />
+                            </t>
+                            <t t-if="overdue_buyer_statement">
+                                <t t-call="zillotech_buyer_statements.overdue_statement_web_template" />
+                            </t>
+                        </tbody>
+                    </t>
+                </form>
+                <br />
+            </t>
+        </template>
+        <template id="buyer_statement_web_template" name="buyer statement web template">
+            <t t-foreach="content_dict['field_datas']" t-as="invoice">
+                <tr t-if="invoice.move_type in ('out_invoice')">
+                    <td>
+                        <input t-if="invoice.state == 'posted' and invoice.payment_state not in ('in_payment', 'paid', 'reversed')" type="checkbox" name="selected_invoice_ids" multiple="multiple" t-att-value="invoice.id" />
+                        <input type="hidden" name="partner" t-att-value="partner.id" />
+                    </td>
+                    <td>
+                        <a t-att-href="invoice.get_portal_url()" t-att-title="invoice.name">
+                            <t t-esc="invoice.name" t-if="invoice.name != '/'" />
+                            <em t-else="">Draft Invoice</em>
+                        </a>
+                    </td>
+                    <td>
+                        <span t-field="invoice.invoice_date" />
+                    </td>
+                    <td class='d-none d-md-table-cell'>
+                        <span t-field="invoice.invoice_date_due" />
+                    </td>
+                    <td class="tx_status">
+                        <t t-if="invoice.state == 'posted' and invoice.payment_state not in ('in_payment', 'paid', 'reversed')">
+                            <span class="badge badge-pill badge-info">
+                                <i class="fa fa-fw fa-clock-o" aria-label="Opened" title="Opened" role="img" />
+                                <span class="d-none d-md-inline">Waiting for Payment</span>
+                            </span>
+                        </t>
+                        <t t-if="invoice.state == 'posted' and invoice.payment_state in ('paid', 'in_payment')">
+                            <span class="badge badge-pill badge-success">
+                                <i class="fa fa-fw fa-check" aria-label="Paid" title="Paid" role="img" />
+                                <span class="d-none d-md-inline">Paid</span>
+                            </span>
+                        </t>
+                        <t t-if="invoice.state == 'posted' and invoice.payment_state == 'reversed'">
+                            <span class="badge badge-pill badge-success">
+                                <i class="fa fa-fw fa-check" aria-label="Reversed" title="Reversed" role="img" />
+                                <span class="d-none d-md-inline">Reversed</span>
+                            </span>
+                        </t>
+                        <t t-if="invoice.state == 'cancel'">
+                            <span class="badge badge-pill badge-warning">
+                                <i class="fa fa-fw fa-remove" aria-label="Cancelled" title="Cancelled" role="img" />
+                                <span class="d-none d-md-inline">Cancelled</span>
+                            </span>
+                        </t>
+                    </td>
+                    <td class="text-center">
+                        <t t-set="tx_ids" t-value="invoice.transaction_ids.filtered(lambda tx: tx.state in ('pending', 'authorized', 'done'))" />
+                        <t t-set="pending_manual_txs" t-value="tx_ids.filtered(lambda tx: tx.state == 'pending' and tx.provider_code in ('none', 'transfer'))" />
+                        <a t-if="invoice.state == 'posted' and invoice.payment_state in ('not_paid', 'partial') and invoice.amount_total and invoice.move_type == 'out_invoice' and (pending_manual_txs or not tx_ids or invoice.amount_residual)" t-att-href="invoice.get_portal_url(anchor='portal_pay')" title="Pay Now" aria-label="Pay now" class="btn btn-sm btn-primary" role="button">
+                            <i class="fa fa-arrow-circle-right" />
+                            <span class='d-none d-md-inline'>Pay Now</span>
+                        </a>
+                    </td>
+                    <td class="text-right">
+                        <span t-esc="-invoice.amount_residual if invoice.move_type == 'out_refund' else invoice.amount_residual" t-options='{"widget": "monetary", "display_currency": invoice.currency_id}' />
+                    </td>
+                </tr>
+            </t>
+        </template>
+        <template id="overdue_statement_web_template" name="buyer statement web template">
+            <t t-foreach="content_dict['field_datas']" t-as="invoice">
+                <tr t-if="invoice.move_type in ('out_invoice')">
+                    <td>
+                        <input t-if="invoice.state == 'posted' and invoice.payment_state not in ('in_payment', 'paid', 'reversed')" type="checkbox" name="selected_invoice_ids" multiple="multiple" t-att-value="invoice.id" />
+                        <input type="hidden" name="partner" t-att-value="partner.id" />
+                    </td>
+                    <td>
+                        <a t-att-href="invoice.get_portal_url()" t-att-title="invoice.name">
+                            <t t-esc="invoice.name" t-if="invoice.name != '/'" />
+                            <em t-else="">Draft Invoice</em>
+                        </a>
+                    </td>
+                    <td>
+                        <span t-field="invoice.invoice_date" />
+                    </td>
+                    <td class='d-none d-md-table-cell'>
+                        <span t-field="invoice.invoice_date_due" />
+                    </td>
+                    <td class="tx_status">
+                        <t t-if="invoice.state == 'posted' and invoice.payment_state not in ('in_payment', 'paid', 'reversed')">
+                            <span class="badge badge-pill badge-info">
+                                <i class="fa fa-fw fa-clock-o" aria-label="Opened" title="Opened" role="img" />
+                                <span class="d-none d-md-inline">Waiting for Payment</span>
+                            </span>
+                        </t>
+                        <t t-if="invoice.state == 'posted' and invoice.payment_state in ('paid', 'in_payment')">
+                            <span class="badge badge-pill badge-success">
+                                <i class="fa fa-fw fa-check" aria-label="Paid" title="Paid" role="img" />
+                                <span class="d-none d-md-inline">Paid</span>
+                            </span>
+                        </t>
+                        <t t-if="invoice.state == 'posted' and invoice.payment_state == 'reversed'">
+                            <span class="badge badge-pill badge-success">
+                                <i class="fa fa-fw fa-check" aria-label="Reversed" title="Reversed" role="img" />
+                                <span class="d-none d-md-inline">Reversed</span>
+                            </span>
+                        </t>
+                        <t t-if="invoice.state == 'cancel'">
+                            <span class="badge badge-pill badge-warning">
+                                <i class="fa fa-fw fa-remove" aria-label="Cancelled" title="Cancelled" role="img" />
+                                <span class="d-none d-md-inline">Cancelled</span>
+                            </span>
+                        </t>
+                    </td>
+                    <td class="text-center">
+                        <t t-set="tx_ids" t-value="invoice.transaction_ids.filtered(lambda tx: tx.state in ('pending', 'authorized', 'done'))" />
+                        <t t-set="pending_manual_txs" t-value="tx_ids.filtered(lambda tx: tx.state == 'pending' and tx.provider_code in ('none', 'transfer'))" />
+                        <a t-if="invoice.state == 'posted' and invoice.payment_state in ('not_paid', 'partial') and invoice.amount_total and invoice.move_type == 'out_invoice' and (pending_manual_txs or not tx_ids or invoice.amount_residual)" t-att-href="invoice.get_portal_url(anchor='portal_pay')" title="Pay Now" aria-label="Pay now" class="btn btn-sm btn-primary" role="button">
+                            <i class="fa fa-arrow-circle-right" />
+                            <span class='d-none d-md-inline'>Pay Now</span>
+                        </a>
+                    </td>
+                    <td class="text-right">
+                        <span t-esc="-invoice.amount_residual if invoice.move_type == 'out_refund' else invoice.amount_residual" t-options='{"widget": "monetary", "display_currency": invoice.currency_id}' />
+                    </td>
+                </tr>
+            </t>
+        </template>
+        <template id="filtered_buyer_statement_web_template" name="filtered buyer statement web template">
+            <t t-foreach="content_dict['field_datas']" t-as="invoice">
+                <tr t-if="invoice.invoice_id.move_type in ('out_invoice')">
+                    <td>
+                        <a t-att-href="invoice.invoice_id.get_portal_url()" t-att-title="invoice.invoice_id.name">
+                            <t t-esc="invoice.invoice_id.name" t-if="invoice.invoice_id.name != '/'" />
+                            <em t-else="">Draft Invoice</em>
+                        </a>
+                    </td>
+                    <td>
+                        <span t-field="invoice.invoice_id.invoice_date" />
+                    </td>
+                    <td class='d-none d-md-table-cell'>
+                        <span t-field="invoice.invoice_id.invoice_date_due" />
+                    </td>
+                    <td class="tx_status">
+                        <t t-if="invoice.invoice_id.state == 'posted' and invoice.invoice_id.payment_state not in ('in_payment', 'paid', 'reversed')">
+                            <span class="badge badge-pill badge-info">
+                                <i class="fa fa-fw fa-clock-o" aria-label="Opened" title="Opened" role="img" />
+                                <span class="d-none d-md-inline">Waiting for Payment</span>
+                            </span>
+                        </t>
+                        <t t-if="invoice.invoice_id.state == 'posted' and invoice.invoice_id.payment_state in ('paid', 'in_payment')">
+                            <span class="badge badge-pill badge-success">
+                                <i class="fa fa-fw fa-check" aria-label="Paid" title="Paid" role="img" />
+                                <span class="d-none d-md-inline">Paid</span>
+                            </span>
+                        </t>
+                        <t t-if="invoice.invoice_id.state == 'posted' and invoice.invoice_id.payment_state == 'reversed'">
+                            <span class="badge badge-pill badge-success">
+                                <i class="fa fa-fw fa-check" aria-label="Reversed" title="Reversed" role="img" />
+                                <span class="d-none d-md-inline">Reversed</span>
+                            </span>
+                        </t>
+                        <t t-if="invoice.invoice_id.state == 'cancel'">
+                            <span class="badge badge-pill badge-warning">
+                                <i class="fa fa-fw fa-remove" aria-label="Cancelled" title="Cancelled" role="img" />
+                                <span class="d-none d-md-inline">Cancelled</span>
+                            </span>
+                        </t>
+                    </td>
+                    <td class="text-center">
+                        <t t-set="tx_ids" t-value="invoice.invoice_id.transaction_ids.filtered(lambda tx: tx.state in ('pending', 'authorized', 'done'))" />
+                        <t t-set="pending_manual_txs" t-value="tx_ids.filtered(lambda tx: tx.state == 'pending' and tx.provider_code in ('none', 'transfer'))" />
+                        <a t-if="invoice.invoice_id.state == 'posted' and invoice.invoice_id.payment_state in ('not_paid', 'partial') and invoice.invoice_id.amount_total and invoice.invoice_id.move_type == 'out_invoice' and (pending_manual_txs or not tx_ids or invoice.invoice_id.amount_residual)" t-att-href="invoice.invoice_id.get_portal_url(anchor='portal_pay')" title="Pay Now" aria-label="Pay now" class="btn btn-sm btn-primary" role="button">
+                            <i class="fa fa-arrow-circle-right" />
+                            <span class='d-none d-md-inline'>Pay Now</span>
+                        </a>
+                    </td>
+                    <td class="text-right">
+                        <span t-esc="-invoice.invoice_id.amount_residual if invoice.invoice_id.move_type == 'out_refund' else invoice.invoice_id.amount_residual" t-options='{"widget": "monetary", "display_currency": invoice.currency_id}' />
+                    </td>
+                </tr>
+            </t>
+        </template>
+        <template id="weekly_buyer_statement_web_template" name="weekly buyer statement web template">
+            <t t-foreach="content_dict['field_datas']" t-as="w_invoice">
+                <tr t-if="w_invoice.w_invoice_id.move_type in ('out_invoice')">
+                    <td>
+                        <a t-att-href="w_invoice.w_invoice_id.get_portal_url()" t-att-title="w_invoice.w_invoice_id.name">
+                            <t t-esc="w_invoice.w_invoice_id.name" t-if="w_invoice.w_invoice_id.name != '/'" />
+                            <em t-else="">Draft Invoice</em>
+                        </a>
+                    </td>
+                    <td>
+                        <span t-field="w_invoice.w_invoice_id.invoice_date" />
+                    </td>
+                    <td class='d-none d-md-table-cell'>
+                        <span t-field="w_invoice.w_invoice_id.invoice_date_due" />
+                    </td>
+                    <td class="tx_status">
+                        <t t-if="w_invoice.w_invoice_id.state == 'posted' and w_invoice.w_invoice_id.payment_state not in ('in_payment', 'paid', 'reversed')">
+                            <span class="badge badge-pill badge-info">
+                                <i class="fa fa-fw fa-clock-o" aria-label="Opened" title="Opened" role="img" />
+                                <span class="d-none d-md-inline">Waiting for Payment</span>
+                            </span>
+                        </t>
+                        <t t-if="w_invoice.w_invoice_id.state == 'posted' and w_invoice.w_invoice_id.payment_state in ('paid', 'in_payment')">
+                            <span class="badge badge-pill badge-success">
+                                <i class="fa fa-fw fa-check" aria-label="Paid" title="Paid" role="img" />
+                                <span class="d-none d-md-inline">Paid</span>
+                            </span>
+                        </t>
+                        <t t-if="w_invoice.w_invoice_id.state == 'posted' and w_invoice.w_invoice_id.payment_state == 'reversed'">
+                            <span class="badge badge-pill badge-success">
+                                <i class="fa fa-fw fa-check" aria-label="Reversed" title="Reversed" role="img" />
+                                <span class="d-none d-md-inline">Reversed</span>
+                            </span>
+                        </t>
+                        <t t-if="w_invoice.w_invoice_id.state == 'cancel'">
+                            <span class="badge badge-pill badge-warning">
+                                <i class="fa fa-fw fa-remove" aria-label="Cancelled" title="Cancelled" role="img" />
+                                <span class="d-none d-md-inline">Cancelled</span>
+                            </span>
+                        </t>
+                    </td>
+                    <td class="text-center">
+                        <t t-set="tx_ids" t-value="w_invoice.w_invoice_id.transaction_ids.filtered(lambda tx: tx.state in ('pending', 'authorized', 'done'))" />
+                        <t t-set="pending_manual_txs" t-value="tx_ids.filtered(lambda tx: tx.state == 'pending' and tx.provider_code in ('none', 'transfer'))" />
+                        <a t-if="w_invoice.w_invoice_id.state == 'posted' and w_invoice.w_invoice_id.payment_state in ('not_paid', 'partial') and w_invoice.w_invoice_id.amount_total and w_invoice.w_invoice_id.move_type == 'out_invoice' and (pending_manual_txs or not tx_ids or w_invoice.w_invoice_id.amount_residual)" t-att-href="w_invoice.w_invoice_id.get_portal_url(anchor='portal_pay')" title="Pay Now" aria-label="Pay now" class="btn btn-sm btn-primary" role="button">
+                            <i class="fa fa-arrow-circle-right" />
+                            <span class='d-none d-md-inline'>Pay Now</span>
+                        </a>
+                    </td>
+                    <td class="text-right">
+                        <span t-esc="-w_invoice.w_invoice_id.amount_residual if w_invoice.w_invoice_id.move_type == 'out_refund' else w_invoice.w_invoice_id.amount_residual" t-options='{"widget": "monetary", "display_currency": w_invoice.currency_id}' />
+                    </td>
+                </tr>
+            </t>
+        </template>
+        <template id="monthly_buyer_statement_web_template" name="monthly buyer statement web template">
+            <t t-foreach="content_dict['field_datas']" t-as="m_invoice">
+                <tr t-if="m_invoice.m_invoice_id.move_type in ('out_invoice')">
+                    <td>
+                        <a t-att-href="m_invoice.m_invoice_id.get_portal_url()" t-att-title="m_invoice.m_invoice_id.name">
+                            <t t-esc="m_invoice.m_invoice_id.name" t-if="m_invoice.m_invoice_id.name != '/'" />
+                            <em t-else="">Draft Invoice</em>
+                        </a>
+                    </td>
+                    <td>
+                        <span t-field="m_invoice.m_invoice_id.invoice_date" />
+                    </td>
+                    <td class='d-none d-md-table-cell'>
+                        <span t-field="m_invoice.m_invoice_id.invoice_date_due" />
+                    </td>
+                    <td class="tx_status">
+                        <t t-if="m_invoice.m_invoice_id.state == 'posted' and m_invoice.m_invoice_id.payment_state not in ('in_payment', 'paid', 'reversed')">
+                            <span class="badge badge-pill badge-info">
+                                <i class="fa fa-fw fa-clock-o" aria-label="Opened" title="Opened" role="img" />
+                                <span class="d-none d-md-inline">Waiting for Payment</span>
+                            </span>
+                        </t>
+                        <t t-if="m_invoice.m_invoice_id.state == 'posted' and m_invoice.m_invoice_id.payment_state in ('paid', 'in_payment')">
+                            <span class="badge badge-pill badge-success">
+                                <i class="fa fa-fw fa-check" aria-label="Paid" title="Paid" role="img" />
+                                <span class="d-none d-md-inline">Paid</span>
+                            </span>
+                        </t>
+                        <t t-if="m_invoice.m_invoice_id.state == 'posted' and m_invoice.m_invoice_id.payment_state == 'reversed'">
+                            <span class="badge badge-pill badge-success">
+                                <i class="fa fa-fw fa-check" aria-label="Reversed" title="Reversed" role="img" />
+                                <span class="d-none d-md-inline">Reversed</span>
+                            </span>
+                        </t>
+                        <t t-if="m_invoice.m_invoice_id.state == 'cancel'">
+                            <span class="badge badge-pill badge-warning">
+                                <i class="fa fa-fw fa-remove" aria-label="Cancelled" title="Cancelled" role="img" />
+                                <span class="d-none d-md-inline">Cancelled</span>
+                            </span>
+                        </t>
+                    </td>
+                    <td class="text-center">
+                        <t t-set="tx_ids" t-value="m_invoice.m_invoice_id.transaction_ids.filtered(lambda tx: tx.state in ('pending', 'authorized', 'done'))" />
+                        <t t-set="pending_manual_txs" t-value="tx_ids.filtered(lambda tx: tx.state == 'pending' and tx.provider_code in ('none', 'transfer'))" />
+                        <a t-if="m_invoice.m_invoice_id.state == 'posted' and m_invoice.m_invoice_id.payment_state in ('not_paid', 'partial') and m_invoice.m_invoice_id.amount_total and m_invoice.m_invoice_id.move_type == 'out_invoice' and (pending_manual_txs or not tx_ids or m_invoice.m_invoice_id.amount_residual)" t-att-href="m_invoice.m_invoice_id.get_portal_url(anchor='portal_pay')" title="Pay Now" aria-label="Pay now" class="btn btn-sm btn-primary" role="button">
+                            <i class="fa fa-arrow-circle-right" />
+                            <span class='d-none d-md-inline'>Pay Now</span>
+                        </a>
+                    </td>
+                    <td class="text-right">
+                        <span t-esc="-m_invoice.m_invoice_id.amount_residual if m_invoice.m_invoice_id.move_type == 'out_refund' else m_invoice.m_invoice_id.amount_residual" t-options='{"widget": "monetary", "display_currency": m_invoice.currency_id}' />
+                    </td>
+                </tr>
+            </t>
+        </template>
+        <template id="custom_buyer_statement_web_template" name="custom buyer statement web template">
+            <t t-foreach="content_dict['field_datas']" t-as="c_invoice">
+                <tr t-if="c_invoice.c_invoice_id.move_type in ('out_invoice')">
+                    <td>
+                        <a t-att-href="c_invoice.c_invoice_id.get_portal_url()" t-att-title="c_invoice.c_invoice_id.name">
+                            <t t-esc="c_invoice.c_invoice_id.name" t-if="c_invoice.c_invoice_id.name != '/'" />
+                            <em t-else="">Draft Invoice</em>
+                        </a>
+                    </td>
+                    <td>
+                        <span t-field="c_invoice.c_invoice_id.invoice_date" />
+                    </td>
+                    <td class='d-none d-md-table-cell'>
+                        <span t-field="c_invoice.c_invoice_id.invoice_date_due" />
+                    </td>
+                    <td class="tx_status">
+                        <t t-if="c_invoice.c_invoice_id.state == 'posted' and c_invoice.c_invoice_id.payment_state not in ('in_payment', 'paid', 'reversed')">
+                            <span class="badge badge-pill badge-info">
+                                <i class="fa fa-fw fa-clock-o" aria-label="Opened" title="Opened" role="img" />
+                                <span class="d-none d-md-inline">Waiting for Payment</span>
+                            </span>
+                        </t>
+                        <t t-if="c_invoice.c_invoice_id.state == 'posted' and c_invoice.c_invoice_id.payment_state in ('paid', 'in_payment')">
+                            <span class="badge badge-pill badge-success">
+                                <i class="fa fa-fw fa-check" aria-label="Paid" title="Paid" role="img" />
+                                <span class="d-none d-md-inline">Paid</span>
+                            </span>
+                        </t>
+                        <t t-if="c_invoice.c_invoice_id.state == 'posted' and c_invoice.c_invoice_id.payment_state == 'reversed'">
+                            <span class="badge badge-pill badge-success">
+                                <i class="fa fa-fw fa-check" aria-label="Reversed" title="Reversed" role="img" />
+                                <span class="d-none d-md-inline">Reversed</span>
+                            </span>
+                        </t>
+                        <t t-if="c_invoice.c_invoice_id.state == 'cancel'">
+                            <span class="badge badge-pill badge-warning">
+                                <i class="fa fa-fw fa-remove" aria-label="Cancelled" title="Cancelled" role="img" />
+                                <span class="d-none d-md-inline">Cancelled</span>
+                            </span>
+                        </t>
+                    </td>
+                    <td class="text-center">
+                        <t t-set="tx_ids" t-value="c_invoice.c_invoice_id.transaction_ids.filtered(lambda tx: tx.state in ('pending', 'authorized', 'done'))" />
+                        <t t-set="pending_manual_txs" t-value="tx_ids.filtered(lambda tx: tx.state == 'pending' and tx.provider_code in ('none', 'transfer'))" />
+                        <a t-if="c_invoice.c_invoice_id.state == 'posted' and c_invoice.c_invoice_id.payment_state in ('not_paid', 'partial') and c_invoice.c_invoice_id.amount_total and c_invoice.c_invoice_id.move_type == 'out_invoice' and (pending_manual_txs or not tx_ids or c_invoice.c_invoice_id.amount_residual)" t-att-href="c_invoice.c_invoice_id.get_portal_url(anchor='portal_pay')" title="Pay Now" aria-label="Pay now" class="btn btn-sm btn-primary" role="button">
+                            <i class="fa fa-arrow-circle-right" />
+                            <span class='d-none d-md-inline'>Pay Now</span>
+                        </a>
+                    </td>
+                    <td class="text-right">
+                        <span t-esc="-c_invoice.c_invoice_id.amount_residual if c_invoice.c_invoice_id.move_type == 'out_refund' else c_invoice.c_invoice_id.amount_residual" t-options='{"widget": "monetary", "display_currency": c_invoice.currency_id}' />
+                    </td>
+                </tr>
+            </t>
+        </template>
+    </data>
+</odoo>

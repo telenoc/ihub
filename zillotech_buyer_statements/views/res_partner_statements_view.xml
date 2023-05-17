@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="res_partner_inherit_buyer_supplier_form" model="ir.ui.view">
+            <field name="name">res.partner.supplier.form</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form" />
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='category_id']" position="after">
+                    <field name="exclude_statements" />
+                    <field name="exclude_monthly_statements" attrs="{'invisible': [('exclude_statements', '=', False)]}" />
+                    <field name="exclude_weekly_statements" attrs="{'invisible': [('exclude_statements', '=', False)]}" />
+                </xpath>
+                <xpath expr="//page[@name='internal_notes']" position="after">
+                    <page string="Customer Statements" name="buyer_statement_page">
+                        <div class="row" name="statement_button">
+                            <div style="width: 24%;">
+                                <button name="action_connect_filter_statement_form" type="object" class="btn-primary" string="Customer Statements By Date" />
+                            </div>
+                            <div style="width: 16%%;">
+                                <button name="action_print_buyer_statement" type="object" class="btn-primary" string="Print Statements" />
+                            </div>
+                            <div style="width: 15%%;">
+                                <button name="action_sent_buyer_mail" type="object" class="btn-primary" string="Send Statement" />
+                            </div>
+                            <div style="width: 22%;">
+                                <button name="action_print_buyer_overdue_statement" type="object" class="btn-primary" string="Print Overdue Statements" />
+                            </div>
+                            <div style="width: 22%;">
+                                <button name="action_sent_buyer_overdue_mail" type="object" class="btn-primary" string="Send Overdue Statement" />
+                            </div>
+                        </div>
+                        <br />
+                        <br />
+                        <separator string="Customer Statements" />
+                        <field name="buyer_balance_ids">
+                            <tree string="Customer Statements line" editable="bottom" delete="0" create="0" colors="red:(not invoice_date_due or invoice_date_due&lt;=current_date) and result&gt;0">
+                                <field name="name" readonly="True" />
+                                <field name="invoice_date" readonly="True" />
+                                <field name="invoice_date_due" readonly="True" />
+                                <field name="amount_total_signed" readonly="True" string="Invoices/Debits" />
+                                <field name="credit_payment" readonly="True" string="Payments/Credits" />
+                                <field name="balance_due_amount" readonly="True" string="Balance" />
+                                <field name="state" readonly="True" invisible="1" />
+                                <field name="company_id" readonly="True" groups="base.group_multi_company" />
+                            </tree>
+                        </field>
+
+
+                        <group name="note_group" col="6" class="mt-2 mt-md-0">
+                            <group colspan="4">
+                                                                <field name="disable_global_notes" />
+                                <field name="global_note" />
+                            </group>
+                            <group class="oe_subtotal_footer oe_right" colspan="2" name="sale_total">
+                                 <field name="buyer_amount_due_payment" />
+                            <br />
+                            <field name="buyer_amount_overdue_payment" />
+                            </group>
+                            <div class="clearfix"/>
+                        </group>
+
+
+
+                        <!-- <group class="oe_subtotal_footer oe_right">
+                            <field name="buyer_amount_due_payment" />
+                            <br />
+                            <field name="buyer_amount_overdue_payment" />
+                        </group>
+                        <group>
+                                <field name="disable_global_notes" />
+                                <field name="global_note" />
+                        </group>
+                        <group string="Internal Notes">
+                            <field name="nck_internal_notes" nolabel="1" placeholder="This note can be internal notes or remittance address." />
+                        </group> -->
+                    </page>
+                    <page string="Supplier Statements" name="supplier_statement_page">
+                        <div class="row" name="statement_button">
+                            <div class="col-6">
+                            </div>
+                            <div class="col-3">
+                                <button name="action_connect_supplier_filter_statement_form" type="object" class="btn-primary" string="Supplier Statements By Date" />
+                            </div>
+                            <div class="col-3">
+                                <button name="action_print_supplier_statement" type="object" class="btn-primary" string="Print supplier Statements" />
+                            </div>
+                        </div>
+                        <br />
+                        <br />
+                        <separator string="Supplier Statements" />
+                        <field name="supplier_balance_ids">
+                            <tree string="Supplier Statements line" editable="bottom" delete="0" create="0" colors="red:(not invoice_date_due or invoice_date_due&lt;=current_date) and result&gt;0">
+                                <field name="name" readonly="True" />
+                                <field name="invoice_date" readonly="True" />
+                                <field name="invoice_date_due" readonly="True" />
+                                <field name="amount_total_signed" readonly="True" string="Invoices/Debits" />
+                                <field name="credit_payment" readonly="True" string="Payments/Credits" />
+                                <field name="balance_due_amount" readonly="True" string="Balance" />
+                                <field name="state" readonly="True" invisible="1" />
+                                <field name="company_id" readonly="True" groups="base.group_multi_company" />
+                            </tree>
+                        </field>
+                        <group class="oe_subtotal_footer oe_right">
+                            <field name="supplier_amount_due_payment" />
+                            <br />
+                            <field name="supplier_amount_overdue_payment" />
+                        </group>
+                    </page>
+                </xpath>
+                <xpath expr="//page/group[@name='container_row_2']" position="inside">
+                    <group name="qr_code" priority="3">
+                        <field name="qr_code" widget='image' class="oe_avatar" />
+                        <field name="qr_code_url" invisible="1" />
+                    </group>
+                </xpath>
+            </field>
+        </record>
+        <record id="view_partner_inherit_followup_search" model="ir.ui.view">
+            <field name="name">res.partner.search.inherited</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_res_partner_filter" />
+            <field name="arch" type="xml">
+                <xpath expr="//filter[@name='supplier']" position="after">
+                    <filter string="Overdue Customers" name="customer_overdue" domain="[('buyer_amount_overdue_payment','>',0)]" context="{'res_partner_search_mode': 'customer'}" />
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

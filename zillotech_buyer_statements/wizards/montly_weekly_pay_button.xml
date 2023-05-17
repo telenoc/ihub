@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <record model="ir.actions.server" id="action_customer_monthly_statements">
+            <field name="name">Customer Monthly Statements</field>
+            <field name="model_id" ref="base.model_res_partner" />
+            <field name="binding_model_id" ref="base.model_res_partner" />
+            <field name="state">code</field>
+            <field name="code">
+                action = records.action_show_monthly_statements()
+            </field>
+        </record>
+        <record model="ir.actions.server" id="action_customer_weekly_statements">
+            <field name="name">Customer Weekly Statements</field>
+            <field name="model_id" ref="base.model_res_partner" />
+            <field name="binding_model_id" ref="base.model_res_partner" />
+            <field name="state">code</field>
+            <field name="code">
+                action = records.action_show_weekly_statements()
+            </field>
+        </record>
+    </data>
+</odoo>
