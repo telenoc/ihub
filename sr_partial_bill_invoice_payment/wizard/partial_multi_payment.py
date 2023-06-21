@@ -190,7 +190,7 @@ class srPartialMultiPaymentWizard(models.TransientModel):
                                 "account_id": line_id.account_id.id,
                                 "partner_id": line_id.partner_id.id,
                                 "name": line_id.move_name + ' - ' + line.move_id.name,
-                                "amount_currency": -amount_to_pay,
+                                "amount_currency": amount_to_pay,
                                 "debit": amount_to_pay,
                                 "credit": 0.0,
                                 "tax_ids": [(6, 0, line_id.tax_ids.ids)],
@@ -205,7 +205,7 @@ class srPartialMultiPaymentWizard(models.TransientModel):
                             {
                                 "debit": line_id.debit - amount_to_pay,
                                 "credit": 0.0,
-                                "amount_currency": -(line_id.debit - amount_to_pay),
+                                "amount_currency": (line_id.debit - amount_to_pay),
                             },
                         )
                     )
